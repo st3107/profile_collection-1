@@ -28,6 +28,7 @@ bec.disable_plots()
 RE.md['facility'] = 'NSLS-II'
 RE.md['group'] = 'PDF'
 RE.md['beamline_id'] = '28-ID-1'
+RE.md['cycle'] = '2018-1'
 
 def get_user_info():
     ''' This function prompts the user for basic info and 
@@ -46,3 +47,6 @@ def get_user_info():
     RE.md['PI Name'] = PI_name
     RE.md['Proposal ID'] = prop_ID
     RE.md['wavelength'] = wavelength
+
+# get_user_info()
+

@@ -12,18 +12,26 @@ def acquisition_plan(dets, motors, fs, sample_name, images_per_set=None):
         sample_name : the sample name
     '''
     def myplan():
+        
         for det in dets:
             if images_per_set is not None:
-                yield from bps.abs_set(det.images_per_set, images_per_set)
+                yield from bps.mov(det.images_per_set, images_per_set)
+                # add this in because there seems to be a weird issue
+                # where images_per_set doesn't kick in until after second stage
+                yield from bps.stage(det)
+                yield from bps.unstage(det)
 
+        for det in dets:
+            yield from bps.stage(det)
+        # close fast shutter, now take a dark
+        yield from bps.mov(fs,0)
+        yield from trigger_and_read(dets + motors, name='dark')
         # open fast shutter
-        yield from bps.abs_set(fs,1)
+        yield from bps.mov(fs,1)
         # for the motors, trigger() won't be called since it doesn't exist
         yield from trigger_and_read(dets + motors, name='primary')
-        # close fast shutter, now take a dark
-        yield from bps.abs_set(fs,0)
-        yield from trigger_and_read(dets + motors, name='dark')
+        for det in dets:
+            yield from bps.unstage(det)
 
         
-    yield from bpp.run_wrapper(bpp.stage_wrapper(myplan(), dets),md=dict(sample_name=sample_name))
-    
+    yield from bpp.run_wrapper(myplan(), md=dict(sample_name=sample_name))
