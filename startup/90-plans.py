@@ -16,10 +16,6 @@ def acquisition_plan(dets, motors, fs, sample_name, images_per_set=None):
         for det in dets:
             if images_per_set is not None:
                 yield from bps.mov(det.images_per_set, images_per_set)
-                # add this in because there seems to be a weird issue
-                # where images_per_set doesn't kick in until after second stage
-                yield from bps.stage(det)
-                yield from bps.unstage(det)
 
         for det in dets:
             yield from bps.stage(det)
