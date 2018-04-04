@@ -208,7 +208,7 @@ class DarkSubtractionCallback(CallbackBase):
             self.image_key in doc['data']):
             event_filled = list(db.fill_events([doc], [self.descriptors[descriptor_uid]]))[0]
            
-            self.images[stream_name] = event_filled['data'][self.image_key]
+            self.images[stream_name] = event_filled['data'][self.image_key].astype(np.int32)
 
             # now check if there is an entry in both
             # TODO : Allow for multiple images
