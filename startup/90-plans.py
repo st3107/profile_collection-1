@@ -19,6 +19,8 @@ def acquisition_plan(dets, motors, fs, sample_name, images_per_set=None):
 
         for det in dets:
             yield from bps.stage(det)
+
+        yield from bps.sleep(1)
         # close fast shutter, now take a dark
         yield from bps.mov(fs,0)
         yield from trigger_and_read(dets + motors, name='dark')
