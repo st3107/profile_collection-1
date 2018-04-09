@@ -1,5 +1,6 @@
 # main plans
 
+# this was the original toy plan
 def acquisition_plan(dets, motors, fs, sample_name, images_per_set=None):
     '''
         This is testing a simple acquisition plan.
@@ -33,3 +34,6 @@ def acquisition_plan(dets, motors, fs, sample_name, images_per_set=None):
 
         
     yield from bpp.run_wrapper(myplan(), md=dict(sample_name=sample_name))
+
+
+

@@ -1,5 +1,6 @@
 # Make ophyd listen to pyepics.
 import nslsii
+import time
 
 # See docstring for nslsii.configure_base() for more details
 # this command takes away much of the boilerplate for settting up a profile
@@ -50,3 +51,50 @@ def get_user_info():
 
 # get_user_info()
 
+from bluesky.magics import BlueskyMagics
+from ophyd import EpicsSignal, EpicsSignalRO
+
+
+def which_pvs(cls=None):
+    ''' returns list of all existing pv's.
+        cls : class, optional
+            the class of PV's to search for
+            defaults to [Device, Signal]
+    '''
+    if cls is None:
+        cls = [Device, Signal]
+    user_ns = get_ipython().user_ns
+
+    obj_list = list()
+    for key, obj in user_ns.items():
+        # ignore objects beginning with "_"
+        # (mainly for ipython stored objs from command line
+        # return of commands)
+        # also check its a subclass of desired classes
+        if not key.startswith("_") and isinstance(obj, tuple(cls)):
+            obj_list.append((key, obj))
+
+    return obj_list 
+
+
+def print_all_pvs():
+    cols = ["Python name", "Ophyd Name"]
+    print("{:20s} \t {:20s}".format(*cols))
+    print("="*40)
+    obj_list = which_pvs()
+    for name, obj in obj_list:
+        print("{:20s} \t {:20s}".format(name, obj.name))
+
+def print_all_pv_values():
+    cols = ["Python name", "Time stamp", "Value"]
+    print("{:40s} \t {:20s} \t\t\t {:20s}".format(*cols))
+    print("="*120)
+    obj_list = which_pvs()
+    for name, obj in obj_list:
+        try:
+            ret = obj.read()
+        except AttributeError:
+            pass
+
+        for key, val in ret.items():
+            print("{:40s} \t {:20s} \t {}".format(key, time.ctime(val['timestamp']), val['value']))

@@ -328,6 +328,9 @@ def get_file_list(datum_id, db):
 
 
 # this call back will create soft links for PE
+# the format is a list
+# each item can be one of the following:
+# 1. a tuple ('start', 'cycle')
 #data_keys = [pe1.image.name]
 data_keys = ["pe1_image"]
 #data_info_keys = ["Det_1_Z"]#Det_1_Z.name]
@@ -356,6 +359,7 @@ data_info_keys_bgsub=[
     ('start', 'wavelength'),
     ('start', 'scan_id'),
     ('event', 'data', 'Det_1_Z'),
+    #('event', 'data', ''),
 ]
 
 soft_link_callback = SoftLinkCallBack(db, data_keys, data_info_keys_softlink, root='/SHARE/user_data')
