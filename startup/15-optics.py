@@ -1,8 +1,5 @@
 "Define motors related to optics"
 
-from ophyd import EpicsMotor, Device, EpicsSignalRO
-from ophyd import Component as Cpt
-
 
 class Slits(Device):
     top = Cpt(EpicsMotor, 'T}Mtr')
