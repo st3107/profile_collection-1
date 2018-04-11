@@ -1,6 +1,6 @@
 "Define motors related to optics"
 
-from ophyd import EpicsMotor, Device
+from ophyd import EpicsMotor, Device, EpicsSignalRO
 from ophyd import Component as Cpt
 
 
@@ -31,3 +31,17 @@ class SideBounceMono(Device):
 sbm = SideBounceMono("XF:28ID1A-OP{Mono:SBM-Ax:", name='sbm')
 # Shutters:
 fs = EpicsSignal('XF:28ID1B-OP{PSh:1-Det:2}Cmd', name='fs')  # fast shutter
+
+class Mirror(Device):
+    y_upstream = Cpt(EpicsMotor, 'YU}Mtr')
+    y_downstream_inboard = Cpt(EpicsMotor, 'YDI}Mtr')
+    y_downstream_outboard = Cpt(EpicsMotor, 'YDO}Mtr')
+    bend_upstream = Cpt(EpicsMotor, 'BndU}Mtr')
+    bend_encoder = Cpt(EpicsSignalRO, 'BndU}Pos:Enc-I')
+    bend_downstream = Cpt(EpicsMotor, 'BndD}Mtr')
+    twist_encoder = Cpt(EpicsSignalRO, 'BndD}Pos:Enc-I')
+    # TODO: add coordinated motions later:
+    # y_upstream, y_downstream_inboard, y_downstream_outboard
+
+Mirror_VFM = Mirror('XF:28ID1A-OP{Mir:VFM-Ax:', name='Mirror_VFM')
+
