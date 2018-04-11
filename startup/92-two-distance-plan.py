@@ -1,13 +1,14 @@
 
 '''
 TODO :
-    1. finish adding all motor PV's
-    2. Add the prosilica detectors
+   ?1. finish adding all motor PV's
+   +2. Add the prosilica detectors
     3. implement the two_distance_plan
     4. Verify filenames make sense
     5. Implement a grid scan (and retrieve data)
         (on monochromator pitch/yaw)
         count on what?
+    6. Make sure Milinda gets GPFS (or other shared mount) mounted on xf28id1-ioc2
 
     Later:
     6. add temperature sensor

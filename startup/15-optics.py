@@ -42,3 +42,22 @@ class Mirror(Device):
 
 Mirror_VFM = Mirror('XF:28ID1A-OP{Mir:VFM-Ax:', name='Mirror_VFM')
 
+class OpticsTableADC(Device):
+    upstream_jack_inboard = Cpt(EpicsMotor, 'YUI}Mtr')
+    upstream_jack_outboard = Cpt(EpicsMotor, 'YUO}Mtr')
+    downstream_jack_outboard = Cpt(EpicsMotor, 'YD}Mtr')
+    X_upstream = Cpt(EpicsMotor, 'XU}Mtr')
+    X_downstream = Cpt(EpicsMotor, 'XD}Mtr')
+    Z = Cpt(EpicsMotor, 'Z}Mtr')
+
+optics_table_adc = OpticsTableADC(prefix="XF:28ID1B-ES{Tbl:1-Ax:",
+                                  name="optics_table_adc")
+
+class SpinnerGoniohead(Device):
+    X = Cpt(EpicsMotor, 'X}Mtr')
+    Y = Cpt(EpicsMotor, 'Y}Mtr')
+    Z = Cpt(EpicsMotor, 'Z}Mtr')
+    Ry = Cpt(EpicsMotor, 'Ry}Mtr')
+
+spinner_goniohead = SpinnerGoniohead(prefix="XF:28ID1B-ES{Stg:Smpl-Ax:",
+                                     name="spinner_goniohead")
