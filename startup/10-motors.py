@@ -1,6 +1,6 @@
-from ophyd import EpicsMotor
 import ophyd
-from ophyd import EpicsSignal
+from ophyd import (Device, Component as Cpt,
+                   EpicsSignal, EpicsSignalRO, EpicsMotor)
 
 Det_1_X = EpicsMotor('XF:28ID1B-ES{Det:1-Ax:X}Mtr', name='Det_1_X')
 Det_1_Y = EpicsMotor('XF:28ID1B-ES{Det:1-Ax:Y}Mtr', name='Det_1_Y')
