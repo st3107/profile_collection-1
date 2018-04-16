@@ -41,3 +41,19 @@ class ECS(Device):
 
 ECS_laser_foil_filter = ECS('XF:28ID1B-ES{', name='ECS_laser_foil_filter')
 
+
+class FilterBank(Device):
+    flt1 = Cpt(EpicsSignal, '1}Cmd:Opn-Cmd', string=True)
+    flt2 = Cpt(EpicsSignal, '2}Cmd:Opn-Cmd', string=True)
+    flt3 = Cpt(EpicsSignal, '3}Cmd:Opn-Cmd', string=True)
+    flt4 = Cpt(EpicsSignal, '4}Cmd:Opn-Cmd', string=True)
+
+class FilterBankTwoButtonShutter(Device):
+    flt1 = Cpt(TwoButtonShutter, '1}')
+    flt2 = Cpt(TwoButtonShutter, '2}')
+    flt3 = Cpt(TwoButtonShutter, '3}')
+    flt4 = Cpt(TwoButtonShutter, '4}')
+
+fb = FilterBank('XF:28ID1B-OP{Fltr:', name='fb')
+fb_two_button_shutters = FilterBankTwoButtonShutter('XF:28ID1B-OP{Fltr:', name='fb_two_button_shutters')
+
