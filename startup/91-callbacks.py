@@ -80,8 +80,8 @@ class SoftLinkCallBack(CallbackBase):
                     prefix, ext = os.path.splitext(dst)
                     dst_md = prefix + ".txt"  
                     yaml.dump(self.start_doc, open(dst_md, "w"), default_flow_style=False)
-                    # print("Soft linking {} to {}".format(src, dst))
-                    # print("Writing metadata to {}".format(dst_md))
+                    print("Soft linking {} to {}".format(src, dst))
+                    print("Writing metadata to {}".format(dst_md))
 
     def stop(self, doc):
         ''' clear the start data.'''

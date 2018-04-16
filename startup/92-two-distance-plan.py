@@ -37,7 +37,7 @@ def two_distance_plan(dets, motor, fs, sample_name, distances, images_per_set=No
         # iterate over the distances for the motor "motor"
         for distance in distances:
             # move the motor to distance
-            yield from bps.mov(motor, distance)
+            yield from bps.abs_set(motor, distance, wait=True)
     
             # stage the detectors
             for det in dets:

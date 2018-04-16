@@ -9,7 +9,7 @@ from ophyd.areadetector.filestore_mixins import (FileStoreIterativeWrite,
                                                  FileStoreTIFFSquashing,
                                                  FileStoreTIFF)
 from ophyd import Signal, EpicsSignal, EpicsSignalRO # Tim test
-from ophyd import Component as C, Device
+from ophyd import Component as C, Device, DeviceStatus
 from ophyd import StatusBase
 
 # from shutter import sh1
@@ -248,9 +248,9 @@ pe1 = PerkinElmerStandard('XF:28ID1-ES{Det:PE1}', name='pe1', read_attrs=['tiff'
                         #trigger_cycle=[[('image', {shctl1: 1}),
                                         #('dark_image', {shctl1: 0})]])
 
-#pe1c = PerkinElmerContinuous('XF:28IDC-ES:1{Det:PE1}', name='pe1',
-                             #read_attrs=['tiff', 'stats1.total'],
-                             #plugin_name='tiff')
+pe1c = PerkinElmerContinuous('XF:28ID1-ES{Det:PE1}', name='pe1c',
+                             read_attrs=['tiff', 'stats1.total'],
+                             plugin_name='tiff')
 
 # some defaults, as an example of how to use this
 # pe1.configure(dict(images_per_set=6, number_of_sets=10))

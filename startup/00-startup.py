@@ -84,6 +84,13 @@ def print_all_pvs():
     obj_list = which_pvs()
     for name, obj in obj_list:
         print("{:20s} \t {:20s}".format(name, obj.name))
+        try:
+            if not isinstance(obj, EpicsMotor):
+                for comp in obj.component_names:                
+                    print("    {}".format(comp))
+        except AttributeError:
+            pass
+
 
 def print_all_pv_values():
     cols = ["Python name", "Time stamp", "Value"]

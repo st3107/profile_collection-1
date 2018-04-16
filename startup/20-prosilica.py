@@ -64,6 +64,7 @@ class StandardProsilicaWithTIFF(StandardProsilica):
 
 
 ## This renaming should be reversed: no correspondance between CSS screens, PV names and ophyd....
+'''
 Test_Cam1 = StandardProsilicaWithTIFF('XF:28ID1-BI{Test-Cam:1}', name='Test_Cam1')
 Cam2 = StandardProsilicaWithTIFF('XF:28ID1-BI{Cam:2}', name='Cam2')
 
@@ -86,3 +87,4 @@ for camera in [Test_Cam1, Cam2]:
     camera.tiff.read_attrs = []
 
 
+'''
