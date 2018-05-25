@@ -6,7 +6,7 @@ import time
 # this command takes away much of the boilerplate for settting up a profile
 # (such as setting up best effort callbacks etc)
 nslsii.configure_base(get_ipython().user_ns, 'pdf', pbar=True, bec=True,
-                      magics=True, mpl=True, epics_context=True)
+                      magics=True, mpl=True)
 
 # disable plotting for now
 bec.disable_plots()
@@ -32,7 +32,7 @@ RE.md['beamline_id'] = '28-ID-1'
 RE.md['cycle'] = '2018-1'
 
 def get_user_info():
-    ''' This function prompts the user for basic info and 
+    ''' This function prompts the user for basic info and
         adds it to RE.md.
 
         All data in RE.md gets saved in each start document for each run.
@@ -44,7 +44,7 @@ def get_user_info():
     PI_name = input("Enter PI Name: ")
     prop_ID = input("Enter Proposal ID: ")
     wavelength = input("Enter wavelength: ")
-    
+
     RE.md['PI Name'] = PI_name
     RE.md['Proposal ID'] = prop_ID
     RE.md['wavelength'] = wavelength
@@ -74,7 +74,7 @@ def which_pvs(cls=None):
         if not key.startswith("_") and isinstance(obj, tuple(cls)):
             obj_list.append((key, obj))
 
-    return obj_list 
+    return obj_list
 
 
 def print_all_pvs():
@@ -86,7 +86,7 @@ def print_all_pvs():
         print("{:20s} \t {:20s}".format(name, obj.name))
         try:
             if not isinstance(obj, EpicsMotor):
-                for comp in obj.component_names:                
+                for comp in obj.component_names:
                     print("    {}".format(comp))
         except AttributeError:
             pass
