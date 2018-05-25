@@ -48,22 +48,21 @@ class StandardProsilica(SingleTrigger, ProsilicaDetector):
     # only so that it can ensure that the plugin is not auto-saving.
     tiff = Cpt(TIFFPluginEnsuredOff, suffix='TIFF1:')
 
-    @property
-    def hints(self):
-        return {'fields': [self.stats1.total.name]}
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('labels', ['cameras'])
+        super().__init__(*args, **kwargs)
+        self.stats1.total.kind = 'hinted'
 
 
 class StandardProsilicaWithTIFF(StandardProsilica):
     tiff = Cpt(TIFFPluginWithFileStore,
                suffix='TIFF1:',
-               # write_path_template='/SHARE/psccd/%Y/%m/%d/',
-               # root='/SHARE/psccd',
-               write_path_template='/tmp/data',
-               root='/tmp',
-               reg=db.reg)
+               write_path_template='/nsls2/xf28id1/psccd/%Y/%m/%d/',
+               root='/nsls2/xf28id1/psccd')
 
 
 ## This renaming should be reversed: no correspondance between CSS screens, PV names and ophyd....
+# As of May 25, 2018 the cameras are not working
 '''
 Test_Cam1 = StandardProsilicaWithTIFF('XF:28ID1-BI{Test-Cam:1}', name='Test_Cam1')
 Cam2 = StandardProsilicaWithTIFF('XF:28ID1-BI{Cam:2}', name='Cam2')
@@ -85,6 +84,4 @@ for camera in all_standard_pros:
 for camera in [Test_Cam1, Cam2]:
     camera.read_attrs.append('tiff')
     camera.tiff.read_attrs = []
-
-
 '''

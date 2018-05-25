@@ -126,11 +126,17 @@ class XPDPerkinElmer(PerkinElmerDetector):
     tiff = C(XPDTIFFPlugin, 'TIFF1:',
              write_path_template='Z:/img/%Y/%m/%d/',
              read_path_template='/SHARE/img/%Y/%m/%d/',
+             root='/SHARE/img/',
              cam_name='cam',  # used to configure "tiff squashing"
              proc_name='proc',  # ditto
              read_attrs=[],
-             root='/SHARE/img/',
-             reg=db.reg)
+             # TODO: switch to this configuration using GPFS later
+             # once G:\ drive is mounted to the Windows IOC
+             # (a new Windows 10 machine in the rack upstairs)
+             # write_path_template='G:\\img\\%Y\\%m\\%d\\',
+             # read_path_template='/nsls2/xf28id1/pe1_data/%Y/%m/%d/',
+             # root='/nsls2/xf28id1/pe1_data',
+             )
 
     # hdf5 = C(XPDHDF5Plugin, 'HDF1:',
     #          write_path_template='G:/pe1_data/%Y/%m/%d/',

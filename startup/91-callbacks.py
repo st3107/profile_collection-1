@@ -113,6 +113,7 @@ def check_name_collision(dst):
 
     return num, dst
 
+
 def filename_from_info(docs, data_info_keys, prefix, suffix):
     '''
         from docs (dict of start, descriptor and event docs)
@@ -159,7 +160,7 @@ def filename_from_info(docs, data_info_keys, prefix, suffix):
     
 
 class DarkSubtractionCallback(CallbackBase):
-    def __init__(self, cbs, image_key = "pe1_image", primary_stream="primary",
+    def __init__(self, cbs, image_key="pe1_image", primary_stream="primary",
                  dark_stream="dark", db=None, root='/SHARE/user_data',
                  data_info_keys=[], suffix=".tiff"):
         '''
@@ -245,9 +246,7 @@ class DarkSubtractionCallback(CallbackBase):
         # TODO : play with mode
         im = Image.fromarray(data, mode="I;16")
         im.save(filename)
-        
-        
-        
+ 
     def create_docs(self, data):
         '''        
             Custom doc creation script for bg subbed image.
@@ -315,7 +314,8 @@ def get_handler(datum_id, db):
     datums = list(db.reg.datum_gen_given_resource(resource))
     handler = db.reg.get_spec_handler(resource['uid'])
     return handler
-    
+
+
 def get_file_list(datum_id, db):
     resource = db.reg.resource_given_datum_id(datum_id)
     datums = db.reg.datum_gen_given_resource(resource)
@@ -334,7 +334,7 @@ def get_file_list(datum_id, db):
 #data_keys = [pe1.image.name]
 data_keys = ["pe1_image"]
 #data_info_keys = ["Det_1_Z"]#Det_1_Z.name]
-data_info_keys_softlink=[ 
+data_info_keys_softlink = [ 
     ('start', 'cycle'),
     "/",
     ('start', 'Proposal ID'),
