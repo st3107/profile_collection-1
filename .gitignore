@@ -82,9 +82,6 @@ extra/
 history.sqlite
 *.swp
 
-profile_analysis/db/
-profile_analysis/static
-profile_analysis/history.sqlite
-profile_collection/db/
-profile_collection/static
-profile_collection/history.sqlite
+db/
+static/
+history.sqlite
