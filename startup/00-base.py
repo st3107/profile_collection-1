@@ -1,6 +1,7 @@
 # Make ophyd listen to pyepics.
 import nslsii
 import time
+from bluesky.utils import ts_msg_hook
 
 # See docstring for nslsii.configure_base() for more details
 # this command takes away much of the boilerplate for settting up a profile
@@ -25,6 +26,7 @@ bec.disable_plots()
 # ophyd.logger.setLevel(logging.DEBUG)
 # logging.basicConfig(level=logging.DEBUG)
 
+RE.msg_hook = ts_msg_hook
 
 RE.md['facility'] = 'NSLS-II'
 RE.md['group'] = 'PDF'

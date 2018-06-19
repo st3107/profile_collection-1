@@ -12,6 +12,7 @@ def acquisition_plan(dets, motors, fs, sample_name, images_per_set=None):
         fs : the fast shutter
         sample_name : the sample name
     '''
+    start_time = time.time()
     def myplan():
         
         for det in dets:
@@ -34,3 +35,5 @@ def acquisition_plan(dets, motors, fs, sample_name, images_per_set=None):
 
         
     yield from bpp.run_wrapper(myplan(), md=dict(sample_name=sample_name))
+    end_time = time.time()
+    print(f'Duration: {end_time - start_time:.3f} sec')
