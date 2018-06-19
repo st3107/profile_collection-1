@@ -31,7 +31,7 @@ class PDFShutter(Device):
                                  self.close_sts.SUB_VALUE)
 
         self.open_sts.subscribe(self._watcher_open,
-                                 self.open_sts.SUB_VALUE)
+                                self.open_sts.SUB_VALUE)
 
     def set(self, value, *, wait=False, **kwargs):
         if value not in ('Open', 'Close'):
@@ -168,7 +168,6 @@ class XPDPerkinElmer(PerkinElmerDetector):
         super().__init__(*args, **kwargs)
         self.stage_sigs.update([(self.cam.trigger_mode, 'Internal'),
                                ])
-
 
 
 class ContinuousAcquisitionTrigger(BlueskyInterface):

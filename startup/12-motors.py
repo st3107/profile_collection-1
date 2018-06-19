@@ -2,7 +2,7 @@ import ophyd
 from ophyd import (Device, Component as Cpt,
                    EpicsSignal, EpicsSignalRO, EpicsMotor)
 from nslsii.devices import TwoButtonShutter
-
+#import nslsii.devices
 
 Det_1_X = EpicsMotor('XF:28ID1B-ES{Det:1-Ax:X}Mtr', name='Det_1_X', labels=['positioners'])
 Det_1_Y = EpicsMotor('XF:28ID1B-ES{Det:1-Ax:Y}Mtr', name='Det_1_Y', labels=['positioners'])

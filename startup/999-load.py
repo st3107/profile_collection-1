@@ -24,13 +24,11 @@ if glbl_dict['is_simulation']:
                                    ring_current, fb)
     pe1c = xpd_pe1c # alias
 
-configure_device(area_det=pe1c, shutter=fs, db=db,
-                 # they are not ready at PDF beamline at this moment
-                 #temp_controller=cs700, 
-                 temp_controller=None, 
-                 #filter_bank=fb,
-                 ring_current=ring_current
-                 )
+configure_device(area_det=pe1c, shutter=fs,
+                 temp_controller=None,
+                 db=db,
+                 filter_bank=fb,
+                 ring_current=ring_current)
 
 # cache previous glbl state
 reload_glbl_dict = _reload_glbl()
@@ -77,7 +75,7 @@ else:
 from xpdacq.calib import *
 
 # analysis functions, only at beamline
-from xpdan.data_reduction import *
+#from xpdan.data_reduction import *
 
 print('OK, ready to go.  To continue, follow the steps in the xpdAcq')
 print('documentation at http://xpdacq.github.io/xpdacq\n')
