@@ -341,10 +341,13 @@ data_info_keys_softlink = [
     "/",
     ('descriptor', 'name'),
     "/",
+    ('event', 'data', 'Det_1_Z'),
+    "/",
     ('start', 'sample_name'),
     ('start', 'wavelength'),
     ('start', 'scan_id'),
     ('event', 'data', 'Det_1_Z'),
+    ('event', 'data', 'cryostream_T'),
     ('descriptor', 'name'),
 ]
 
@@ -355,10 +358,13 @@ data_info_keys_bgsub=[
     "/",
     ('descriptor', 'name'),
     "/",
+    ('event', 'data', 'Det_1_Z'),
+    "/",
     ('start', 'sample_name'),
     ('start', 'wavelength'),
     ('start', 'scan_id'),
     ('event', 'data', 'Det_1_Z'),
+    ('event', 'data', 'cryostream_T'),
     #('event', 'data', ''),
 ]
 

@@ -248,6 +248,7 @@ class PerkinElmerMulti(MultiTrigger, XPDPerkinElmer):
 
 
 pe1 = PerkinElmerStandard('XF:28ID1-ES{Det:PE1}', name='pe1', read_attrs=['tiff'])
+#pe1.stage_sigs.pop('cam.acquire')
 
 #pe1m = PerkinElmerMulti('XF:28IDC-ES:1{Det:PE1}', name='pe1', read_attrs=['tiff'],
                         #trigger_cycle=[[('image', {shctl1: 1}),

@@ -48,46 +48,46 @@ eurotherm = Eurotherm('XF:28IDC-ES:1{Env:04}T-I',
 
 class CryoStat(Device):
     # readback
-    T = Cpt(EpicsSignalRO, ':IN1')
+    T = Cpt(EpicsSignalRO, 'T-I')
     # setpoint
-    setpoint = Cpt(EpicsSignal, read_pv=":OUT1:SP_RBV",
-                   write_pv=":OUT1:SP",
+    setpoint = Cpt(EpicsSignal, read_pv="T-RB",
+                   write_pv="T-SP",
                    add_prefix=('suffix', 'read_pv', 'write_pv'))
     # heater power level
     heater = Cpt(EpicsSignal, ':HTR1')
 
     # configuration
-    dead_band = Cpt(AttributeSignal, attr='_dead_band')
+    dead_band = Cpt(EpicsSignal, 'T:AtSP-SP', string=True)
     heater_range = Cpt(EpicsSignal, ':HTR1:Range', string=True)
-    scan = Cpt(EpicsSignal, ':read.SCAN', string=True)
+    # don't know what this is?
+    #scan = Cpt(EpicsSignal, ':read.SCAN', string=True)
     mode = Cpt(EpicsSignal, ':OUT1:Mode', string=True)
     cntrl = Cpt(EpicsSignal, ':OUT1:Cntrl', string=True)
     # trigger signal
     trig = Cpt(EpicsSignal, ':read.PROC')
 
-    def trigger(self):
-        self.trig.put(1, wait=True)
-        return DeviceStatus(self, done=True, success=True)
+    #def trigger(self):
+        #self.trig.put(1, wait=True)
+        #return DeviceStatus(self, done=True, success=True)
 
-    def __init__(self, *args, dead_band, read_attrs=None,
+    def __init__(self, *args, read_attrs=None,
                  configuration_attrs=None, **kwargs):
         if read_attrs is None:
             read_attrs = ['T', 'setpoint']
-        if configuration_attrs is None:
-            configuration_attrs = ['heater_range', 'dead_band',
-                                   'mode', 'cntrl']
+        #if configuration_attrs is None:
+            #configuration_attrs = ['heater_range', 'dead_band',
+                                   #'mode', 'cntrl']
         super().__init__(*args, read_attrs=read_attrs,
                          configuration_attrs=configuration_attrs,
                          **kwargs)
         self._target = None
-        self._dead_band = dead_band
         self._sts = None
 
     def _sts_mon(self, value, **kwargs):
         if (self._target is None or
-                 np.abs(self._target - value) < self._dead_band):
+                 np.abs(self._target - value) < float(self.dead_band.get())):
             self.T.clear_sub(self._sts_mon)
-            self.scan.put('Passive', wait=True)
+            #self.scan.put('Passive', wait=True)
             if self._sts is not None:
                 self._sts._finished()
                 self._sts = None
@@ -95,9 +95,9 @@ class CryoStat(Device):
 
     def set(self, val):
         self._target = val
-        self.setpoint.put(val, wait=True)
+        self.setpoint.put(val)#, wait=True)
         sts = self._sts = DeviceStatus(self)
-        self.scan.put('.2 second')
+        #self.scan.put('.2 second')
         self.T.subscribe(self._sts_mon)
 
         return sts
@@ -108,9 +108,9 @@ class CryoStat(Device):
             self._sts._finished(success=success)
         self._sts = None
         self._target = None
-        self.scan.put('Passive', wait=True)
+        #self.scan.put('Passive', wait=True)
 
 
 # TODO: uncomment later once the device is available
-# cryostat = CryoStat('XF:28IDC_ES1:LS335:{CryoStat}', name='cryostat', dead_band=1)
+cryostream = CryoStat('XF:28ID1-ES:1{Env:01}', name='cryostream')
 
