@@ -258,5 +258,60 @@ pe1c = PerkinElmerContinuous('XF:28ID1-ES{Det:PE1}', name='pe1c',
                              read_attrs=['tiff', 'stats1.total'],
                              plugin_name='tiff')
 
+import time
+class CachedDetector:
+    '''
+        This is a dark image detector. It doesn't do anything.
+        This detector does not support a hierarchy of devices!
+
+    '''
+    def __init__(self, det, attrs, expire_time):
+        '''
+            Initialize the detector det.
+            det : the detector
+            attrs : the attrs to read from
+            expire_time : the expiration time
+        '''
+        self._det = det
+        self._attrs = attrs
+        self._expire_time = expire_time
+        self._read_cache = dict()
+        self._current_read = None
+
+    def trigger(self):
+        '''
+            Trigger the detector.
+            Checks the cache and time
+        '''
+        # check the cache
+        attr_vals = (obj.get() for obj in self._attrs)
+        self._cur_attr_vals = attr_vals
+
+        read_val = self._read_cache.get(attr_vals, None)
+        if read_val is None:
+            self._det.trigger()
+            new_val = self._det.read()
+            self._read_cache[attr_vals] = {'time': time.time(),
+                                            'data':  new_val}
+        # trigger etc need to finish later
+        data = self._read_cache[attr_vals]
+        if np.abs(data['time']-time.time()) . self._expire_time:
+            self._det.trigger()
+            new_val = self._det.read()
+            self._read_cache[attr_vals] = {'time': time.time(),
+                                            'data':  new_val}
+
+
+    def read(self):
+        return self._read_cache[self_cur_attr_vals]['data']
+
+
+    # TODO: maybe check if det is staged
+    def stage(self):
+        pass
+
+    def unstage(self):
+        pass
+
 # some defaults, as an example of how to use this
 # pe1.configure(dict(images_per_set=6, number_of_sets=10))
