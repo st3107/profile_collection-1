@@ -119,7 +119,7 @@ cryostream = CryoStat('XF:28ID1-ES:1{Env:01}', name='cryostream')
 # TODO : PV needs to be fixed for done signal
 # (doesn't work on ramp down)
 class LinkamFurnace(PVPositioner):
-    readback = C(EpicsSignalRO, 'RAMP:LIMIT:SET.VAL')
+    readback = C(EpicsSignalRO, 'TEMP')
     setpoint = C(EpicsSignal, 'RAMP:LIMIT:SET')
     done = C(EpicsSignalRO, 'STATUS')
     stop_signal = C(EpicsSignal, 'RAMP:CTRL:SET')
