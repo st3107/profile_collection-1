@@ -42,7 +42,7 @@ class Eurotherm(EpicsSignalPositioner):
         # override #@!$(#$ hard-coded timeouts
         return super().set(*args, timeout=1000000, **kwargs)
 
-    T = EpicsSignalRO('XF:28ID1-ES:1{Env:04}T-I')
+T = EpicsSignalRO('XF:28ID1-ES:1{Env:04}T-I', name='T')
         
 
 eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}T-SP',
