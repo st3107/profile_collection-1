@@ -36,16 +36,18 @@ cs700.setpoint.name = 'temperature_setpoint'
 """
 
 # TODO: add later once available
-"""
+
 class Eurotherm(EpicsSignalPositioner):
     def set(self, *args, **kwargs):
         # override #@!$(#$ hard-coded timeouts
         return super().set(*args, timeout=1000000, **kwargs)
 
-eurotherm = Eurotherm('XF:28IDC-ES:1{Env:04}T-I',
-                                 write_pv='XF:28IDC-ES:1{Env:04}T-SP',
-                                 tolerance= 3, name='eurotherm')
-"""
+    T = EpicsSignalRO('XF:28ID1-ES:1{Env:04}T-I')
+        
+
+eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}T-SP',
+                                 write_pv='XF:28ID1-ES:1{Env:04}T-SP',
+                                 tolerance= 2, name='eurotherm')
 
 class CryoStream(Device):
     # readback
