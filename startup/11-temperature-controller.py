@@ -1,6 +1,7 @@
 from ophyd import PVPositioner, EpicsSignal, EpicsSignalRO, Device
 from ophyd.signal import AttributeSignal
 from ophyd.mixins import EpicsSignalPositioner
+
 from ophyd import Component as C
 from ophyd import Component as Cpt
 from ophyd.device import DeviceStatus
@@ -38,21 +39,14 @@ cs700.setpoint.name = 'temperature_setpoint'
 # TODO: add later once available
 
 class Eurotherm(EpicsSignalPositioner):
-    readback = C(EpicsSignalRO, 'T-I')
-    setpoint = C(EpicsSignal, 'T-SP')
-    def set(self, *args, timeout=None, **kwargs):
+    def set(self, *args, **kwargs):
         # override #@!$(#$ hard-coded timeouts
-        return super().set(*args, timeout=timeout, **kwargs)
+        return super().set(*args, timeout=1000000, **kwargs)
 
-    def trigger(self):
-        # There is nothing to do. Just report that we are done.
-        # Note: This really should not necessary to do --
-        # future changes to PVPositioner may obviate this code.
-        status = DeviceStatus(self)
-        status._finished()
-        return status     
-
-eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}', name='eurotherm')
+eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}T-I',
+                                 write_pv='XF:28ID1-ES:1{Env:04}T-SP',
+                                 tolerance=1, name='eurotherm')
+eurotherm.settle_time = 120
 
 
 class CryoStream(Device):
