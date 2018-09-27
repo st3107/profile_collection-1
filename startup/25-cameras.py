@@ -58,9 +58,8 @@ class StandardPointGrey(SingleTrigger, PointGreyDetector):
 class StandardPointGreyWithTIFF(StandardPointGrey):
     tiff = Cpt(TIFFPluginWithFileStore,
                suffix='TIFF1:',
-               write_path_template='/mnt/ws3/xpddData/%Y/%m/%d/',
-               root='/mnt/ws3',
-               reg=db.reg)
+               write_path_template='/mnt/ws4/XPDD_Data1/pg1/%Y/%m/%d/',
+               root='/mnt/ws4/XPDD_Data1')
 
 
 pg1 = StandardPointGreyWithTIFF('xf28idd-pg1:', name='pg1')
