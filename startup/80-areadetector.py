@@ -134,8 +134,8 @@ class XPDPerkinElmer(PerkinElmerDetector):
              # once G:\ drive is mounted to the Windows IOC
              # (a new Windows 10 machine in the rack upstairs)
              # write_path_template='G:\\img\\%Y\\%m\\%d\\',
-             # read_path_template='/nsls2/xf28id1/pe1_data/%Y/%m/%d/',
-             # root='/nsls2/xf28id1/pe1_data',
+             # read_path_template='/nsls2/xf28id1/data/pe1_data/%Y/%m/%d/',
+             # root='/nsls2/xf28id1/data/pe1_data',
              )
 
     # hdf5 = C(XPDHDF5Plugin, 'HDF1:',
