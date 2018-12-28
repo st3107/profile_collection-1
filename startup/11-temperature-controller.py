@@ -7,6 +7,7 @@ from ophyd import Component as Cpt
 from ophyd.device import DeviceStatus
 from ophyd import PVPositioner
 
+from nslsii.temperature_controllers import Eurotherm
 
 class CS700TemperatureController(PVPositioner):
     readback = C(EpicsSignalRO, 'T-I')
@@ -38,16 +39,16 @@ cs700.setpoint.name = 'temperature_setpoint'
 
 # TODO: add later once available
 
-class Eurotherm(EpicsSignalPositioner):
-    def set(self, *args, **kwargs):
+#class Eurotherm(EpicsSignalPositioner):
+#    def set(self, *args, **kwargs):
         # override #@!$(#$ hard-coded timeouts
-        return super().set(*args, timeout=1000000, **kwargs)
+#        return super().set(*args, timeout=1000000, **kwargs)
 
-eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}T-I',
-                                 write_pv='XF:28ID1-ES:1{Env:04}T-SP',
-                                 tolerance=1, name='eurotherm')
-eurotherm.settle_time = 120
-
+eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}T-', name='eurotherm')
+#                                write_pv='XF:28ID1-ES:1{Env:04}T-SP',
+#                                 tolerance=1, name='eurotherm')
+eurotherm.timeout.set(1200) # commented out by MA 11/09/2018
+#eurotherm.equilibrium_time(10)
 
 class CryoStream(Device):
     # readback

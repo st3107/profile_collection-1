@@ -26,7 +26,7 @@ bec.disable_plots()
 # ophyd.logger.setLevel(logging.DEBUG)
 # logging.basicConfig(level=logging.DEBUG)
 
-RE.msg_hook = ts_msg_hook
+# RE.msg_hook = ts_msg_hook
 
 RE.md['facility'] = 'NSLS-II'
 RE.md['group'] = 'PDF'

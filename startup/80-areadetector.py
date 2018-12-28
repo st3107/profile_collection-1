@@ -1,6 +1,6 @@
 import time as ttime
 from ophyd.areadetector import (PerkinElmerDetector, ImagePlugin,
-                                TIFFPlugin, StatsPlugin, HDF5Plugin,
+                                TIFFPlugin, HDF5Plugin,
                                 ProcessPlugin, ROIPlugin)
 from ophyd.device import BlueskyInterface
 from ophyd.areadetector.trigger_mixins import SingleTrigger, MultiTrigger
@@ -12,10 +12,28 @@ from ophyd import Signal, EpicsSignal, EpicsSignalRO # Tim test
 from ophyd import Component as C, Device, DeviceStatus
 from ophyd import StatusBase
 
+from nslsii.ad33 import StatsPluginV33
+
 # from shutter import sh1
 
 #shctl1 = EpicsSignal('XF:28IDC-ES:1{Det:PE1}cam1:ShutterMode', name='shctl1')
 #shctl1 = EpicsMotor('XF:28IDC-ES:1{Sh2:Exp-Ax:5}Mtr', name='shctl1')
+
+# monkey patch for trailing slash problem
+def _ensure_trailing_slash(path):
+    """
+    'a/b/c' -> 'a/b/c/'
+    EPICS adds the trailing slash itself if we do not, so in order for the
+    setpoint filepath to match the readback filepath, we need to add the
+    trailing slash ourselves.
+    """
+    newpath = os.path.join(path, '')
+    if newpath[0] != '/' and newpath[-1] == '/':
+        # make it a windows slash
+        newpath = newpath[:-1]
+    return newpath
+
+ophyd.areadetector.filestore_mixins._ensure_trailing_slash = _ensure_trailing_slash
 
 
 class PDFShutter(Device):
@@ -123,13 +141,25 @@ class XPDPerkinElmer(PerkinElmerDetector):
     _default_configuration_attrs = (
         PerkinElmerDetector._default_configuration_attrs +
         ('images_per_set', 'number_of_sets'))
-    tiff = C(XPDTIFFPlugin, 'TIFF1:',
-             write_path_template='Z:/img/%Y/%m/%d/',
-             read_path_template='/SHARE/img/%Y/%m/%d/',
-             root='/SHARE/img/',
-             cam_name='cam',  # used to configure "tiff squashing"
-             proc_name='proc',  # ditto
-             read_attrs=[],
+    tiff = C(XPDTIFFPlugin, 'TIFF1:', #- MA
+             #write_path_template='Z:/data/pe1_data/%Y/%m/%d', #- DO
+             write_path_template='Z:\\data\\pe1_data\\%Y\\%m\\%d\\', #- DO
+             #write_path_template='Z:/img/%Y/%m/%d/', #- MA
+             #read_path_template='/SHARE/img/%Y/%m/%d/', #- MA
+             read_path_template='/nsls2/xf28id1/data/pe1_data/%Y/%m/%d/', #- DO
+             root='/nsls2/xf28id1/data/pe1_data/', #-DO
+             #root='/SHARE/img/', #-MA
+             cam_name='cam',  # used to configure "tiff squashing" #-MA
+             proc_name='proc',  # ditto #-MA
+             read_attrs=[], #- MA
+    #tiff = C(XPDTIFFPlugin, 'TIFF1:',
+             #write_path_template='/home/xf28id1/Documents/Milinda/PE1Data',
+             #read_path_template='/SHARE/img/%Y/%m/%d/',
+             #root='/SHARE/img/',
+             #cam_name='cam',  # used to configure "tiff squashing"
+             #proc_name='proc',  # ditto
+             #read_attrs=[],
+
              # TODO: switch to this configuration using GPFS later
              # once G:\ drive is mounted to the Windows IOC
              # (a new Windows 10 machine in the rack upstairs)
@@ -151,11 +181,11 @@ class XPDPerkinElmer(PerkinElmerDetector):
     images_per_set = C(Signal, value=1, add_prefix=())
     number_of_sets = C(Signal, value=1, add_prefix=())
 
-    stats1 = C(StatsPlugin, 'Stats1:')
-    stats2 = C(StatsPlugin, 'Stats2:')
-    stats3 = C(StatsPlugin, 'Stats3:')
-    stats4 = C(StatsPlugin, 'Stats4:')
-    stats5 = C(StatsPlugin, 'Stats5:')
+    stats1 = C(StatsPluginV33, 'Stats1:')
+    stats2 = C(StatsPluginV33, 'Stats2:')
+    stats3 = C(StatsPluginV33, 'Stats3:')
+    stats4 = C(StatsPluginV33, 'Stats4:')
+    stats5 = C(StatsPluginV33, 'Stats5:')
 
     roi1 = C(ROIPlugin, 'ROI1:')
     roi2 = C(ROIPlugin, 'ROI2:')
@@ -193,10 +223,11 @@ class ContinuousAcquisitionTrigger(BlueskyInterface):
         self._save_started = False
 
     def stage(self):
-        if self.cam.acquire.get() != 1:
-            raise RuntimeError("The ContinuousAcuqisitionTrigger expects "
-                               "the detector to already be acquiring.")
-        return super().stage()
+        # if self.cam.acquire.get() != 1:
+        #     raise RuntimeError("The ContinuousAcuqisitionTrigger expects "
+        #                        "the detector to already be acquiring.")
+        super().stage()
+        self.cam.acquire.put(1)
         # put logic to look up proper dark frame
         # die if none is found
 
@@ -315,3 +346,4 @@ class CachedDetector:
 
 # some defaults, as an example of how to use this
 # pe1.configure(dict(images_per_set=6, number_of_sets=10))
+
