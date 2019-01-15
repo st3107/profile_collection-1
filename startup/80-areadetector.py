@@ -223,11 +223,24 @@ class ContinuousAcquisitionTrigger(BlueskyInterface):
         self._save_started = False
 
     def stage(self):
-        # if self.cam.acquire.get() != 1:
-        #     raise RuntimeError("The ContinuousAcuqisitionTrigger expects "
-        #                        "the detector to already be acquiring.")
+        if self.cam.acquire.get() != 1:
+             ##foolishly added by DO
+             try:
+                self.cam.acquire.put(1)
+                print ("The detector wasn't properly acquiring :(")
+                time.sleep(1)
+                print ("Don't worry, I probably fixed it for you!")
+             except:
+                 raise RuntimeError("The ContinuousAcuqisitionTrigger expects "
+                                    "the detector to already be acquiring."
+                                    "I was unable to fix it, please restart the ui.") #new line, DO
+             #old style, simple runtime error (no rescue attempt)
+             #raise RuntimeError("The ContinuousAcuqisitionTrigger expects "
+             #                   "the detector to already be acquiring.")
+             
+        #if we get this far, we can now stage the detector. 
         super().stage()
-        self.cam.acquire.put(1)
+        
         # put logic to look up proper dark frame
         # die if none is found
 

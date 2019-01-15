@@ -201,8 +201,14 @@ class DarkSubtractionCallback(CallbackBase):
     def event(self, doc):
         data_dict = doc['data'] 
         descriptor_uid = doc['descriptor']
+        
+        #added by DO to fix crash where streams not relevant to xpdac exist (like baseline)
+        try:
+            stream_name = self.descriptors[descriptor_uid]['name'] #original line
+        except KeyError:
+            #print ('tacos')
+            return None
 
-        stream_name = self.descriptors[descriptor_uid]['name']
         # check it's a prim or dark stream and the key matches the image key
         # desired
         if (stream_name in [self.pstream, self.dstream] and
