@@ -65,5 +65,5 @@ class XPDDDexelaDetector(SingleTrigger, DexelaDetector):
         return ret
 
 
-dexela = XPDDDexelaDetector('XF:28IDD-ES:2{Dex:DEX}', name='dexela')
+dexela = XPDDDexelaDetector('XF:28IDD-ES:2{Det:DEX}', name='dexela')
 dexela.read_attrs = ['tiff1']
