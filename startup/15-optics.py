@@ -28,6 +28,8 @@ class SideBounceMono(Device):
 sbm = SideBounceMono("XF:28ID1A-OP{Mono:SBM-Ax:", name='sbm')
 # Shutters:
 fs = EpicsSignal('XF:28ID1B-OP{PSh:1-Det:2}Cmd', name='fs')  # fast shutter
+# Close the shutter on stop
+fs.stop = lambda : fs.set(1)
 
 class Mirror(Device):
     y_upstream = Cpt(EpicsMotor, 'YU}Mtr')
