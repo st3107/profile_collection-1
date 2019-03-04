@@ -30,9 +30,9 @@ class XPDDDexelaDetector(SingleTrigger, DexelaDetector):
     tiff1 = Cpt(DexelaTiffPlugin, 'TIFF1:',
                read_attrs=[],
                configuration_attrs=[],
-               write_path_template='Z:\\%Y\\%m\\%d\\',
-               read_path_template='/nsls2/xf28id2/XF28ID2/dexela/%Y/%m/%d/',
-               root='/nsls2/xf28id2/XF28ID2/dexela/')
+               write_path_template='Z:%Y\\%m\\%d\\',
+               read_path_template='/nsls2/xf28id2/dex_data/%Y/%m/%d/',
+               root='/nsls2/xf28id2/dex_data/')
     # this is used as a latch to put the xspress3 into 'bulk' mode
     # for fly scanning.  Do this is a signal (rather than as a local variable
     # or as a method so we can modify this as part of a plan
