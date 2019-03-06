@@ -24,13 +24,16 @@ class XPDDMode(Enum):
     step = 1
     fly = 2
 
+class XPDDDexelaTiffPlugin(TIFFPlugin, FileStoreTIFF, Device):
+    pass
 
 class XPDDDexelaDetector(SingleTrigger, DexelaDetector):
     total_points = Cpt(Signal, value=1, doc="The total number of points to be taken")
-    tiff1 = Cpt(DexelaTiffPlugin, 'TIFF1:',
+    tiff1 = Cpt(XPDDDexelaTiffPlugin, 'TIFF1:',
                read_attrs=[],
                configuration_attrs=[],
-               write_path_template='Z:%Y\\%m\\%d\\',
+               write_path_template='Z:dex_data\\',
+               #write_path_template='Z:dex_data\\%Y\\%m\\%d\\',
                read_path_template='/nsls2/xf28id2/dex_data/%Y/%m/%d/',
                root='/nsls2/xf28id2/dex_data/')
     # this is used as a latch to put the xspress3 into 'bulk' mode
