@@ -29,7 +29,7 @@ class XPDDDexelaTiffPlugin(TIFFPlugin, FileStoreTIFF, Device):
 
 class XPDDDexelaDetector(SingleTrigger, DexelaDetector):
     total_points = Cpt(Signal, value=1, doc="The total number of points to be taken")
-    tiff1 = Cpt(XPDDDexelaTiffPlugin, 'TIFF1:',
+    tiff = Cpt(XPDDDexelaTiffPlugin, 'TIFF1:',
                read_attrs=[],
                configuration_attrs=[],
                write_path_template='Z:dex_data\\',
@@ -69,4 +69,4 @@ class XPDDDexelaDetector(SingleTrigger, DexelaDetector):
 
 
 dexela = XPDDDexelaDetector('XF:28IDD-ES:2{Det:DEX}', name='dexela')
-dexela.read_attrs = ['tiff1']
+dexela.read_attrs = ['tiff']
