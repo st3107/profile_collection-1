@@ -24,8 +24,10 @@ class XPDDMode(Enum):
     step = 1
     fly = 2
 
+
 class XPDDDexelaTiffPlugin(TIFFPlugin, FileStoreTIFF, Device):
     pass
+
 
 class XPDDDexelaDetector(SingleTrigger, DexelaDetector):
     total_points = Cpt(Signal, value=1, doc="The total number of points to be taken")
@@ -46,7 +48,6 @@ class XPDDDexelaDetector(SingleTrigger, DexelaDetector):
         self.cam.stage_sigs['trigger_mode'] = 'Int. Software'
         if self._mode is XPDDMode.fly:
             self.cam.stage_sigs['trigger_mode'] = 'Ext. Edge Single'
-
         return super().stage()
 
     def unstage(self):
