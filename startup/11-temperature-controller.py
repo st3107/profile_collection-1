@@ -281,3 +281,13 @@ linkam_furnace.setpoint.kind = "normal"
 linkam_furnace.readback.kind = "normal"
 linkam_furnace.readback.name = 'temperature'
 linkam_furnace.setpoint.name = 'temperature_setpoint'
+
+## MA
+class Magnet(PVPositioner):
+    readback = Cpt(EpicsSignalRO, 'IPRG')
+    setpoint = Cpt(EpicsSignal, 'SETIPRG')
+    done = Cpt(EpicsSignalRO, 'SETI-Done1')
+
+magnet = Magnet('XF:28ID1-ES{LS625:1}:', name='magnet')
+magnet.done_value =0
+#

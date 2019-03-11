@@ -59,3 +59,8 @@ class FilterBankTwoButtonShutter(Device):
 fb = FilterBank('XF:28ID1B-OP{Fltr:', name='fb')
 fb_two_button_shutters = FilterBankTwoButtonShutter('XF:28ID1B-OP{Fltr:', name='fb_two_button_shutters')
 
+# Spinner Goniohead motors, add by HZ
+Spinnergo_X = EpicsMotor('XF:28ID1B-ES{Stg:Smpl-Ax:X}Mtr', name='Spinnergo_X', labels=['positioners'])
+Spinnergo_Y = EpicsMotor('XF:28ID1B-ES{Stg:Smpl-Ax:Y}Mtr', name='Spinnergo_Y', labels=['positioners'])
+Spinnergo_Z = EpicsMotor('XF:28ID1B-ES{Stg:Smpl-Ax:Z}Mtr', name='Spinnergo_Z', labels=['positioners'])
+Spinnergo_Ry = EpicsMotor('XF:28ID1B-ES{Stg:Smpl-Ax:Ry}Mtr', name='Spinnergo_Ry', labels=['positioners'])

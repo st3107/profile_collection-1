@@ -141,6 +141,7 @@ class XPDPerkinElmer(PerkinElmerDetector):
     _default_configuration_attrs = (
         PerkinElmerDetector._default_configuration_attrs +
         ('images_per_set', 'number_of_sets'))
+
     tiff = C(XPDTIFFPlugin, 'TIFF1:', #- MA
              #write_path_template='Z:/data/pe1_data/%Y/%m/%d', #- DO
              write_path_template='Z:\\data\\pe1_data\\%Y\\%m\\%d\\', #- DO
@@ -151,23 +152,7 @@ class XPDPerkinElmer(PerkinElmerDetector):
              #root='/SHARE/img/', #-MA
              cam_name='cam',  # used to configure "tiff squashing" #-MA
              proc_name='proc',  # ditto #-MA
-             read_attrs=[], #- MA
-    #tiff = C(XPDTIFFPlugin, 'TIFF1:',
-             #write_path_template='/home/xf28id1/Documents/Milinda/PE1Data',
-             #read_path_template='/SHARE/img/%Y/%m/%d/',
-             #root='/SHARE/img/',
-             #cam_name='cam',  # used to configure "tiff squashing"
-             #proc_name='proc',  # ditto
-             #read_attrs=[],
-
-             # TODO: switch to this configuration using GPFS later
-             # once G:\ drive is mounted to the Windows IOC
-             # (a new Windows 10 machine in the rack upstairs)
-             # write_path_template='G:\\img\\%Y\\%m\\%d\\',
-             # read_path_template='/nsls2/xf28id1/data/pe1_data/%Y/%m/%d/',
-             # root='/nsls2/xf28id1/data/pe1_data',
-             )
-
+             read_attrs=[]) #- MA  
     # hdf5 = C(XPDHDF5Plugin, 'HDF1:',
     #          write_path_template='G:/pe1_data/%Y/%m/%d/',
     #          read_path_template='/direct/XF28ID2/pe1_data/%Y/%m/%d/',
@@ -198,6 +183,62 @@ class XPDPerkinElmer(PerkinElmerDetector):
         super().__init__(*args, **kwargs)
         self.stage_sigs.update([(self.cam.trigger_mode, 'Internal'),
                                ])
+
+class XPDPerkinElmer1(XPDPerkinElmer):
+    tiff = C(XPDTIFFPlugin, 'TIFF1:', #- MA
+             #write_path_template='Z:/data/pe1_data/%Y/%m/%d', #- DO
+             write_path_template='Z:\\data\\pe1_data\\%Y\\%m\\%d\\', #- DO
+             #write_path_template='Z:/img/%Y/%m/%d/', #- MA
+             #read_path_template='/SHARE/img/%Y/%m/%d/', #- MA
+             read_path_template='/nsls2/xf28id1/data/pe1_data/%Y/%m/%d/', #- DO
+             root='/nsls2/xf28id1/data/pe1_data/', #-DO
+             #root='/SHARE/img/', #-MA
+             cam_name='cam',  # used to configure "tiff squashing" #-MA
+             proc_name='proc',  # ditto #-MA
+             read_attrs=[], #- MA
+    #tiff = C(XPDTIFFPlugin, 'TIFF1:',
+             #write_path_template='/home/xf28id1/Documents/Milinda/PE1Data',
+             #read_path_template='/SHARE/img/%Y/%m/%d/',
+             #root='/SHARE/img/',
+             #cam_name='cam',  # used to configure "tiff squashing"
+             #proc_name='proc',  # ditto
+             #read_attrs=[],
+
+             # TODO: switch to this configuration using GPFS later
+             # once G:\ drive is mounted to the Windows IOC
+             # (a new Windows 10 machine in the rack upstairs)
+             # write_path_template='G:\\img\\%Y\\%m\\%d\\',
+             # read_path_template='/nsls2/xf28id1/data/pe1_data/%Y/%m/%d/',
+             # root='/nsls2/xf28id1/data/pe1_data',
+             )
+
+class XPDPerkinElmer2(XPDPerkinElmer):
+    tiff = C(XPDTIFFPlugin, 'TIFF1:', #- MA
+             #write_path_template='Z:/data/pe2_data/%Y/%m/%d', #- DO
+             write_path_template='Z:\\data\\pe2_data\\%Y\\%m\\%d\\', #- DO
+             #write_path_template='Z:/img/%Y/%m/%d/', #- MA
+             #read_path_template='/SHARE/img/%Y/%m/%d/', #- MA
+             read_path_template='/nsls2/xf28id1/data/pe2_data/%Y/%m/%d/', #- DO
+             root='/nsls2/xf28id1/data/pe2_data/', #-DO
+             #root='/SHARE/img/', #-MA
+             cam_name='cam',  # used to configure "tiff squashing" #-MA
+             proc_name='proc',  # ditto #-MA
+             read_attrs=[], #- MA
+    #tiff = C(XPDTIFFPlugin, 'TIFF1:',
+             #write_path_template='/home/xf28id1/Documents/Milinda/PE1Data',
+             #read_path_template='/SHARE/img/%Y/%m/%d/',
+             #root='/SHARE/img/',
+             #cam_name='cam',  # used to configure "tiff squashing"
+             #proc_name='proc',  # ditto
+             #read_attrs=[],
+
+             # TODO: switch to this configuration using GPFS later
+             # once G:\ drive is mounted to the Windows IOC
+             # (a new Windows 10 machine in the rack upstairs)
+             # write_path_template='G:\\img\\%Y\\%m\\%d\\',
+             # read_path_template='/nsls2/xf28id1/data/pe2_data/%Y/%m/%d/',
+             # root='/nsls2/xf28id1/data/pe1_data',
+             )
 
 
 class ContinuousAcquisitionTrigger(BlueskyInterface):
@@ -279,28 +320,44 @@ class ContinuousAcquisitionTrigger(BlueskyInterface):
 
 
 
-class PerkinElmerContinuous(ContinuousAcquisitionTrigger, XPDPerkinElmer):
+class PerkinElmerContinuous1(ContinuousAcquisitionTrigger, XPDPerkinElmer1):
     pass
 
 
-class PerkinElmerStandard(SingleTrigger, XPDPerkinElmer):
+class PerkinElmerStandard1(SingleTrigger, XPDPerkinElmer1):
     pass
 
 
-class PerkinElmerMulti(MultiTrigger, XPDPerkinElmer):
+class PerkinElmerMulti1(MultiTrigger, XPDPerkinElmer1):
+    shutter = C(EpicsSignal, 'XF:28IDC-ES:1{Sh:Exp}Cmd-Cmd')
+
+class PerkinElmerContinuous2(ContinuousAcquisitionTrigger, XPDPerkinElmer):
+    pass
+
+
+class PerkinElmerStandard2(SingleTrigger, XPDPerkinElmer2):
+    pass
+
+
+class PerkinElmerMulti2(MultiTrigger, XPDPerkinElmer2):
     shutter = C(EpicsSignal, 'XF:28IDC-ES:1{Sh:Exp}Cmd-Cmd')
 
 
-pe1 = PerkinElmerStandard('XF:28ID1-ES{Det:PE1}', name='pe1', read_attrs=['tiff'])
+pe1 = PerkinElmerStandard1('XF:28ID1-ES{Det:PE1}', name='pe1', read_attrs=['tiff'])
 #pe1.stage_sigs.pop('cam.acquire')
+pe2 = PerkinElmerStandard2('XF:28ID1-ES{Det:PE2}', name='pe2', read_attrs=['tiff'])
 
-#pe1m = PerkinElmerMulti('XF:28IDC-ES:1{Det:PE1}', name='pe1', read_attrs=['tiff'],
+#pe1m = PerkinElmerMulti1('XF:28IDC-ES:1{Det:PE1}', name='pe1', read_attrs=['tiff'],
                         #trigger_cycle=[[('image', {shctl1: 1}),
                                         #('dark_image', {shctl1: 0})]])
 
-pe1c = PerkinElmerContinuous('XF:28ID1-ES{Det:PE1}', name='pe1c',
+pe1c = PerkinElmerContinuous1('XF:28ID1-ES{Det:PE1}', name='pe1c',
                              read_attrs=['tiff', 'stats1.total'],
                              plugin_name='tiff')
+pe2c = PerkinElmerContinuous2('XF:28ID1-ES{Det:PE2}', name='pe2c',
+                             read_attrs=['tiff', 'stats1.total'],
+                             plugin_name='tiff')
+
 
 import time
 class CachedDetector:
