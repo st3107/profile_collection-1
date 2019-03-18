@@ -34,7 +34,7 @@ class XPDDDexelaDetector(SingleTrigger, DexelaDetector):
     tiff = Cpt(XPDDDexelaTiffPlugin, 'TIFF1:',
                read_attrs=[],
                configuration_attrs=[],
-               write_path_template='Z:dex_data\\',
+               write_path_template='Z:\\dex_data\\%Y\\%m\\%d\\',
                #write_path_template='Z:dex_data\\%Y\\%m\\%d\\',
                read_path_template='/nsls2/xf28id2/dex_data/%Y/%m/%d/',
                root='/nsls2/xf28id2/dex_data/')
