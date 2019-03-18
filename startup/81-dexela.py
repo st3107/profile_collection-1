@@ -25,7 +25,7 @@ class XPDDMode(Enum):
     fly = 2
 
 
-class XPDDDexelaTiffPlugin(TIFFPlugin, FileStoreTIFF, Device):
+class XPDDDexelaTiffPlugin(TIFFPlugin,FileStoreIterativeWrite ):
     pass
 
 
