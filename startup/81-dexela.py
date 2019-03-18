@@ -5,7 +5,7 @@ from ophyd import (AreaDetector, CamBase, TIFFPlugin, Component as Cpt,
                     HDF5Plugin, Device, StatsPlugin, ProcessPlugin,
                     ROIPlugin, EpicsSignal)
 from databroker.assets.handlers import HandlerBase
-from ophyd.areadetector.filestore_mixins import (FileStoreIterativeWrite,
+from ophyd.areadetector.filestore_mixins import (FileStoreTIFFIterativeWrite,
                                                  FileStoreHDF5IterativeWrite,
                                                  FileStoreTIFFSquashing,
                                                  FileStoreTIFF,
@@ -25,7 +25,7 @@ class XPDDMode(Enum):
     fly = 2
 
 
-class XPDDDexelaTiffPlugin(TIFFPlugin,FileStoreIterativeWrite ):
+class XPDDDexelaTiffPlugin(TIFFPlugin, FileStoreTIFFIterativeWrite ):
     pass
 
 

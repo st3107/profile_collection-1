@@ -7,7 +7,6 @@ from ophyd import AreaDetector
 class XPDDBlackFlyMode(Enum):
     step = 1
 
-:
 class XPDDBlackFlyTiffPlugin(TIFFPlugin, FileStoreTIFF, Device):
     pass
 
