@@ -71,3 +71,9 @@ bpm2_yfoil = EpicsMotor('XF:28IDA-BI:1{BPM:2-Ax:YFoil}Mtr', name='bpm2_yfoil')
 
 ## FS 3
 fs3_y = EpicsMotor('XF:28IDA-BI:1{FS:3-Ax:Y}Mtr', name='fs3_y')
+
+
+## CJW D Slits
+slt_d = Slits('XF:28IDD-ES:2{Slt', name='slt_d')  # D Hutch Slits
+
+

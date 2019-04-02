@@ -62,9 +62,9 @@ class StandardPointGreyWithTIFF(StandardPointGrey):
                root='/mnt/ws4/XPDD_Data1')
 
 
-pg1 = StandardPointGreyWithTIFF('xf28idd-pg1:', name='pg1')
+# pg1 = StandardPointGreyWithTIFF('xf28idd-pg1:', name='pg1')
 
-all_standard_pros = [pg1]
+all_standard_pros = []
 
 for camera in all_standard_pros:
     camera.read_attrs = ['stats1', 'stats2', 'stats3', 'stats4', 'stats5']
@@ -78,7 +78,7 @@ for camera in all_standard_pros:
     camera.stage_sigs[camera.trans1.blocking_callbacks] = 1
     camera.stage_sigs[camera.cam.image_mode] = 'Single'
 
-for camera in [pg1]:
+for camera in []:
     camera.read_attrs.append('tiff')
     camera.tiff.read_attrs = []
 

@@ -33,6 +33,19 @@ pe1_z = EpicsMotor('XF:28IDC-ES:1{Det:PE1-Ax:Z}Mtr', name='pe1_z')
 
 shctl1 = EpicsMotor('XF:28IDC-ES:1{Sh2:Exp-Ax:5}Mtr', name='shctl1')
 
+#Huber satge
+hth = EpicsMotor('XF:28IDD-ES:2{Stg:Stack-Ax:Hth}Mtr',name='hth')
+yb =  EpicsMotor('XF:28IDD-ES:2{Stg:Stack-Ax:Ybase}Mtr',name='yb')
+xb =  EpicsMotor('XF:28IDD-ES:2{Stg:Stack-Ax:Xbase}Mtr',name='xb')
+y =  EpicsMotor('XF:28IDD-ES:2{Stg:Stack-Ax:Y}Mtr',name='y')
+phi =  EpicsMotor('XF:28IDD-ES:2{Stg:Stack-Ax:Phi}Mtr',name='phi')
+pitch =  EpicsMotor('XF:28IDD-ES:2{Stg:Stack-Ax:Pitch}Mtr',name='pitch')
+roll =  EpicsMotor('XF:28IDD-ES:2{Stg:Stack-Ax:Roll}Mtr',name='roll')
+z =  EpicsMotor('XF:28IDD-ES:2{Stg:Stack-Ax:Z}Mtr',name='z')
+yfine =  EpicsMotor('XF:28IDD-ES:2{Stg:Stack-Ax:Yfine}Mtr',name='yfine')
+xfine =  EpicsMotor('XF:28IDD-ES:2{Stg:Stack-Ax:Xfine}Mtr',name='xfine')
+
+
 
 class FilterBank(ophyd.Device):
     flt1 = ophyd.Component(EpicsSignal, '1-Cmd', string=True)
