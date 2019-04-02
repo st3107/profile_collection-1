@@ -6,7 +6,10 @@ from ophyd import AreaDetector
 
 
 class XPDDBlackFlyTiffPlugin(TIFFPlugin, FileStoreTIFFIterativeWrite, Device):
-    pass
+    def get_frames_per_point(self):
+        if self.parent.cam.image_mode.get(as_string=True) == 'Single':
+            return 1
+        return super().get_frames_per_point()
 
 
 class XPDDBlackFlyDetector(SingleTrigger, AreaDetector):
@@ -16,16 +19,16 @@ class XPDDBlackFlyDetector(SingleTrigger, AreaDetector):
     tiff = Cpt(XPDDBlackFlyTiffPlugin, 'TIFF1:',
                read_attrs=[],
                configuration_attrs=[],
-               write_path_template='Z:\\blackfly_data\\%Y\\%m\\%d\\',
-               read_path_template='/nsls2/xf28id2/blackfly_data/%Y/%m/%d/',
-               root='/nsls2/xf28id2/blackfly_data/')
+               write_path_template='/nsls2/xf28id2/bf_data/%Y/%m/%d/',
+               read_path_template='/nsls2/xf28id2/bf_data/%Y/%m/%d/',
+               root='/nsls2/xf28id2/bf_data/')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def stage(self):
-        self.cam.stage_sigs['image_mode'] = 'Single'
-        self.cam.stage_sigs['trigger_mode'] = 'Internal'
+        self.cam.stage_sigs['image_mode'] = "Single"
+        self.cam.stage_sigs['trigger_mode'] = 'Off'
         return super().stage()
 
 
