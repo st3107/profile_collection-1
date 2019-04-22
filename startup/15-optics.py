@@ -32,9 +32,9 @@ sbm = SideBounceMono("XF:28ID1A-OP{Mono:SBM-Ax:", name='sbm')
 class tempFSShutter:
     
     def set(self, value):
-        if value == 1:
+        if value == 0:
             return fb_two_button_shutters.flt4.set('Close')
-        elif value == 0:
+        elif value == 1:
             return fb_two_button_shutters.flt4.set('Open')
 
     def read(self):
