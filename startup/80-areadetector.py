@@ -178,6 +178,7 @@ class XPDPerkinElmer(PerkinElmerDetector):
     # These attributes together replace `num_images`. They control
     # summing images before they are stored by the detector (a.k.a. "tiff
     # squashing").
+    detector_type = C(Signal, value='Perkin', kind='config')
     images_per_set = C(Signal, value=1, add_prefix=())
     number_of_sets = C(Signal, value=1, add_prefix=())
 
@@ -302,6 +303,8 @@ pe1c = PerkinElmerContinuous('XF:28ID1-ES{Det:PE1}', name='pe1c',
                              read_attrs=['tiff', 'stats1.total'],
                              plugin_name='tiff')
 
+pe1c.detector_type.kind='config'
+pe1.detector_type.kind='config'
 import time
 class CachedDetector:
     '''
