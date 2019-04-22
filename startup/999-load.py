@@ -25,7 +25,7 @@ if glbl_dict['is_simulation']:
     pe1c = xpd_pe1c # alias
 
 configure_device(area_det=pe1c, shutter=fs,
-                 temp_controller=None,
+                 temp_controller=eurotherm, #changed from None to eurotherm on 3/22/19 - DPO
                  db=db,
                  filter_bank=fb,
                  ring_current=ring_current)
