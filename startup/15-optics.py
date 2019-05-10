@@ -1,4 +1,5 @@
 "Define motors related to optics"
+from ophyd.status import SubscriptionStatus
 
 
 class Slits(Device):
@@ -29,27 +30,66 @@ sbm = SideBounceMono("XF:28ID1A-OP{Mono:SBM-Ax:", name='sbm')
 # Shutters:
 #fs = EpicsSignal('XF:28ID1B-OP{PSh:1-Det:2}Cmd', name='fs')  # fast shutter
 #temporary fast shutter
-class tempFSShutter:
-    
-    def set(self, value):
-        if value == 0:
-            return fb_two_button_shutters.flt4.set('Close')
-        elif value == 1:
-            return fb_two_button_shutters.flt4.set('Open')
+# class tempFSShutter:
+#
+#     def set(self, value):
+#         if value == 0:
+#             return fb_two_button_shutters.flt4.set('Close')
+#         elif value == 1:
+#             return fb_two_button_shutters.flt4.set('Open')
+#
+#     def read(self):
+#         return fb_two_button_shutters.read()
+#
+#     def describe(self):
+#         return fb_two_button_shutters.describe()
+#
+#     def stop(self, success=False):
+#         return self.set('close')
 
-    def read(self):
-        return fb_two_button_shutters.read()
-
-    def describe(self):
-        return fb_two_button_shutters.describe() 
-
-    def stop(self, success=False):
-        return self.set('close')
-
-fs = tempFSShutter()
+# fs = tempFSShutter()
 
 # Close the shutter on stop
 # fs.stop = lambda *args, **kwargs: fs.set(0)
+
+class PDFFastShutter(Device):
+    cmd = Cpt(EpicsSignal, 'Cmd', kind='omitted')
+    status = Cpt(EpicsSignal, 'Sts', kind='omitted')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.st = None
+        # TODO: ask CJ to change it downstream to only accept the 'Open' or 'Close' strings (no numbers please!).
+        self.setmap = {'Open': 0, 'Close': 1,
+                       1: 0, 0: 1}  # MR: this is an inversed logic on the xpdacq side
+        self.readmap = {0: 'Open', 1: 'Close'}
+
+    def set(self, val):
+        def check_if_done(value, old_value, **kwargs):
+            if ((val in ['Open', 1] and value == 0) or
+                (val in ['Close', 0] and value == 1)):
+                if self.st is not None:
+                    self.st._finished()
+                    self.st = None
+                return True
+            return False
+        self.cmd.set(self.setmap[val])
+        status = SubscriptionStatus(self.status, check_if_done)
+        return status
+
+    def get(self):
+        return self.readmap[self.cmd.get()]
+
+    def read(self):
+        d = super().read()
+        d[self.name] = {'value': self.get(), 'timestamp': time.time()}
+        return d
+
+    def stop(self, success=False):
+        return self.set('Close')
+
+
+fs = PDFFastShutter('XF:28ID1B-OP{PSh:1-Det:2}', name='fs')
 
 
 class Mirror(Device):
