@@ -37,11 +37,17 @@ cs700.readback.name = 'temperature'
 cs700.setpoint.name = 'temperature_setpoint'
 """
 
-# Do not write a new Eurotherm class use the one from nslsii defined above
-eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}', name='eurotherm')
+# TODO: add later once available
 
-eurotherm.timeout.set(1200)
-eurotherm.equilibrium_time.set(10)
+#class Eurotherm(EpicsSignalPositioner):
+#    def set(self, *args, **kwargs):
+        # override #@!$(#$ hard-coded timeouts
+#        return super().set(*args, timeout=1000000, **kwargs)
+
+eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}T-', name='eurotherm')#                                write_pv='XF:28ID1-ES:1{Env:04}T-SP',
+                                 tolerance=1, name='eurotherm')
+eurotherm.timeout.set(1200) # commented out by MA 11/09/2018
+eurotherm.equilibrium_time(10)
 
 class CryoStream(Device):
     # readback
@@ -274,13 +280,3 @@ linkam_furnace.setpoint.kind = "normal"
 linkam_furnace.readback.kind = "normal"
 linkam_furnace.readback.name = 'temperature'
 linkam_furnace.setpoint.name = 'temperature_setpoint'
-
-## MA
-class Magnet(PVPositioner):
-    readback = Cpt(EpicsSignalRO, 'IPRG')
-    setpoint = Cpt(EpicsSignal, 'SETIPRG')
-    done = Cpt(EpicsSignalRO, 'SETI-Done1')
-
-magnet = Magnet('XF:28ID1-ES{LS625:1}:', name='magnet')
-magnet.done_value =0
-#
