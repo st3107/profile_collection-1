@@ -85,8 +85,8 @@ class PDFFastShutter(Device):
         d[self.name] = {'value': self.get(), 'timestamp': time.time()}
         return d
 
-    def stop(self, success=False):
-        return self.set('Close')
+    # def stop(self, success=False):
+    #     return self.set('Close')
 
 
 fs = PDFFastShutter('XF:28ID1B-OP{PSh:1-Det:2}', name='fs')

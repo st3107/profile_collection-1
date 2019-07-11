@@ -1,3 +1,4 @@
 from bluesky.callbacks.zmq import Publisher
 
-Publisher(glbl['inbound_proxy_address'], RE=xrun)
+pub = Publisher(glbl['inbound_proxy_address'], prefix=b'raw')
+xrun.subscribe(pub)

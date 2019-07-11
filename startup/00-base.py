@@ -10,7 +10,7 @@ nslsii.configure_base(get_ipython().user_ns, 'pdf', pbar=True, bec=True,
                       magics=True, mpl=True)
 
 # disable plotting for now
-bec.disable_plots()
+# bec.disable_plots()
 # Optional: set any metadata that rarely changes.
 # RE.md['beamline_id'] = 'YOUR_BEAMLINE_HERE'
 

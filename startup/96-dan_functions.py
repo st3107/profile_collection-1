@@ -221,7 +221,7 @@ def measure_me_this(df_sample_info, sample_num,measure_time=None):
     return None 
      
 
-def scan_shifter_pos(motor, xmin, xmax, numx, num_samples=0, min_height=.02, min_dist = 5, peak_rad=1.5):
+def scan_shifter_pos(motor, xmin, xmax, numx, num_samples=0, min_height=.02, min_dist = 5, peak_rad=1.5, use_det = True):
     yn_question = lambda q: input(q).lower().strip()[0] == "y" or False 
     print ("")
     print ("I'm going to move the motor: "+str(motor.name))
@@ -390,7 +390,7 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     pos_list = np.linspace(xmin,xmax,numx) 
     fs.set(1)
     fig1, ax1 = plt.subplots() 
-    
+    use_det = True 
     for i, pos in enumerate(pos_list): 
         print ("moving to "+str(pos)) 
         try: 
@@ -398,9 +398,11 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
         except: 
             print ('well, something bad happened') 
             return None 
- 
-        my_int = float(caget("XF:28ID1-ES{Det:PE1}Stats2:Total_RBV")) 
-        #photo_diode = caget("XF:28ID1B-OP{Det:1-Det:2}Amp:bkgnd")
+        
+        if use_det==True:
+            my_int = float(caget("XF:28ID1-ES{Det:PE1}Stats2:Total_RBV")) 
+        else:
+            my_int = float(caget("XF:28ID1B-OP{Det:1-Det:2}Amp:bkgnd"))
         I_list[i] = my_int 
         ax1.scatter(pos, my_int, color='k') 
         plt.pause(.01)         
