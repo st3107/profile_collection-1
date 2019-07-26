@@ -22,11 +22,6 @@ class XPDDBlackFlyDetector(SingleTrigger, AreaDetector):
                write_path_template='/nsls2/xf28id2/bf_data/%Y/%m/%d/',
                read_path_template='/nsls2/xf28id2/bf_data/%Y/%m/%d/',
                root='/nsls2/xf28id2/bf_data/')
-    """ 
-               write_path_template='/epics/data/',
-               read_path_template='/epics/data/',
-               root='/epics/data/')
-    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -35,6 +30,30 @@ class XPDDBlackFlyDetector(SingleTrigger, AreaDetector):
         self.cam.stage_sigs['image_mode'] = "Single"
         self.cam.stage_sigs['trigger_mode'] = 'Off'
         return super().stage()
+
+class XPDDBlackFlyDetectorStaged(XPDDBlackFlyDetector):
+    stage_limit = 5
+
+    def stage(self):
+        for i in range(self.stage_limit):
+            try:
+                super().stage()
+                break
+            except TimeoutError:
+                if i == stage_limit - 1:
+                    raise
+                pass
+    def unstage(self):
+        for i in range(self.stage_limit):
+            try:
+                super().unstage()
+                break
+            except TimeoutError:
+                if i == stage_limit - 1:
+                    raise
+                pass
+
+
 
 
 blackfly = XPDDBlackFlyDetector('XF:28IDD-BI{Det-BlackFly}', name="blackfly_det")

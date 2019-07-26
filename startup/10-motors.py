@@ -55,3 +55,15 @@ class FilterBank(ophyd.Device):
 
 fb = FilterBank('XF:28IDC-OP:1{Fltr}Cmd:Opn', name='fb')
 p_diode = EpicsSignal('XF:28IDC-BI:1{IM:02}Pos-Cmd', name='p_diode', string=True)
+
+# beamstop
+bsx =  EpicsMotor('XF:28IDD-ES:2{BS-Ax:X}Mtr',name='bsx')
+bsy =  EpicsMotor('XF:28IDD-ES:2{BS-Ax:Y}Mtr',name='bsy')
+
+# sigray
+sigx =  EpicsMotor('XF:28IDD-ES:2{Stg:Sigray-Ax:X}Mtr',name='sigx')
+sigy =  EpicsMotor('XF:28IDD-ES:2{Stg:Sigray-Ax:Y}Mtr',name='sigy')
+sigz =  EpicsMotor('XF:28IDD-ES:2{Stg:Sigray-Ax:Z}Mtr',name='sigz')
+sigp =  EpicsMotor('XF:28IDD-ES:2{Stg:Sigray-Ax:Pitch}Mtr',name='sigp')
+sigyaw = EpicsMotor('XF:28IDD-ES:2{Stg:Sigray-Ax:Yaw}Mtr',name='sigyaw')
+

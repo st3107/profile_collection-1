@@ -38,6 +38,8 @@ class XPDDDexelaDetector(SingleTrigger, DexelaDetector):
                read_path_template='/nsls2/xf28id2/dex_data/%Y/%m/%d/',
                root='/nsls2/xf28id2/dex_data/')
 
+    detector_type=Cpt(Signal, value='Dexela 2923', kind='config')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._mode = XPDDMode.step
@@ -59,3 +61,4 @@ class XPDDDexelaDetector(SingleTrigger, DexelaDetector):
 
 dexela = XPDDDexelaDetector('XF:28IDD-ES:2{Det:DEX}', name='dexela')
 dexela.read_attrs = ['tiff']
+dexela.detector_type.kind = 'config'
