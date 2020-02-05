@@ -98,7 +98,7 @@ def plot_xline(my_id, *argv, use_offset=0, use_alpha=1, use_cmap="viridis"):
     try:
         arg_len = len(*argv)
         plot_mode = "typea"
-    except:
+    except Exception:
         arg_len = len(argv)
         plot_mode = "typeb"
 
@@ -128,7 +128,7 @@ def plot_yline(my_id, *argv, use_offset=0, use_alpha=1, use_cmap="viridis"):
     try:
         arg_len = len(*argv)
         plot_mode = "typea"
-    except:
+    except Exception:
         arg_len = len(argv)
         plot_mode = "typeb"
 
@@ -174,7 +174,7 @@ def read_twocol_data(
                     )
                 junk = i
                 break
-            except:
+            except Exception:
                 pass  # print ('nope')
 
     if backjunk == None:
@@ -186,7 +186,7 @@ def read_twocol_data(
                 )
                 backjunk = len(datain) - i - 1
                 break
-            except:
+            except Exception:
                 pass
                 # print ('nope')
 
@@ -373,7 +373,7 @@ def scan_shifter_pos(
                 if int(qans) == 0:
                     print("ok, giving up")
                     return None
-            except:
+            except Exception:
                 print("what, what, whaaat?")
         else:
             print("Ok, great.")
@@ -495,7 +495,7 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
         print("moving to " + str(pos))
         try:
             motor.move(pos)
-        except:
+        except Exception:
             print("well, something bad happened")
             return None
 
