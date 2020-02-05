@@ -277,7 +277,7 @@ def scan_shifter_pos(
     peak_rad=1.5,
     use_det=True,
 ):
-    yn_question = lambda q: input(q).lower().strip()[0] == "y" or False
+    yn_question = lambda q: input(q).lower().strip()[0] == "y"
     print("")
     print("I'm going to move the motor: " + str(motor.name))
     print("It's currently at position: " + str(motor.position))
