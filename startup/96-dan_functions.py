@@ -388,7 +388,6 @@ def _identify_peaks_scan_shifter_pos(
     import matplotlib.pyplot as plt
     from scipy.optimize import curve_fit
     import numpy as np
-    import pandas as pd
 
     if open_new_plot:
         print("making new figure")
