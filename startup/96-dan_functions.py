@@ -205,7 +205,7 @@ def read_twocol_data(
         xin = []
         yin = []
 
-    if shh == False:
+    if not shh:
         print("length " + str(len(xin)))
     if do_not_float:
         if splitchar is None:
@@ -299,7 +299,7 @@ def scan_shifter_pos(
     else:
         print("I confused")
 
-    if yn_question("Confirm scan? [y/n] ") == False:
+    if not yn_question("Confirm scan? [y/n] "):
         print("Aborting operation")
         return None
 
@@ -313,11 +313,8 @@ def scan_shifter_pos(
         return None
 
     print("")
-    if (
-        yn_question(
-            "Move on to fitting? (if not, I'll return [pos_list, I_list]) [y/n] "
-        )
-        == False
+    if not yn_question(
+        "Move on to fitting? (if not, I'll return [pos_list, I_list]) [y/n] "
     ):
         return pos_list, I_list
     plt.close()
@@ -328,7 +325,7 @@ def scan_shifter_pos(
     tpeak_rad = peak_rad
     fit_attempts = 1
 
-    while go_on == False:
+    while not go_on:
         print("\nI'm going to fit peaks with a min_height of " + str(tmin_height))
         print(
             "and min_dist [index values/real vals] of "
@@ -358,7 +355,7 @@ def scan_shifter_pos(
             )
         fit_attempts += 1
         # if yn_question("\nHappy with the fit? [y/n] ") == False:
-        if go_on == False:
+        if not go_on:
             qans = input(
                 "\n1. Change min_height\n2. Change min_dist\n3. Change peak-fit rad\n0. Give up\n : "
             )
@@ -437,7 +434,7 @@ def _identify_peaks_scan_shifter_pos(
     plt.show()
     print("done")
     plt.pause(0.01)
-    if yn_question("Go on? [y/n] ") == False:
+    if not yn_question("Go on? [y/n] "):
         return False, []
 
     # now refine positions
