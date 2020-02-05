@@ -4,6 +4,13 @@ def show_me(my_im,per_low = 1, per_high = 99, use_colorbar=False):
      plt.imshow(my_im,vmin=my_low, vmax=my_high) 
      if use_colorbar: 
          plt.colorbar() 
+import bluesky.plan_stubs as bps
+import bluesky.plans as bp
+import bluesky.preprocessors as bpp
+from bluesky.callbacks import LiveTable
+import uuid
+import numpy as np
+
 
 def show_me_db(my_id,per_low=1, per_high=99, use_colorbar=False,dark_subtract=True,return_im=False):
     my_det_probably = db[my_id].start['detectors'][0]+'_image'
@@ -413,3 +420,81 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     return pos_list, I_list 
 
 
+def simple_ct(dets, exposure, *, md=None):
+    md = md or {}
+
+    def _configure_area_det(det, exposure):
+        """private function to configure pe1c with continuous acquisition mode"""
+
+        def _check_mini_expo(exposure, acq_time):
+            if exposure < acq_time:
+                raise ValueError(
+                    "WARNING: total exposure time: {}s is shorter "
+                    "than frame acquisition time {}s\n"
+                    "you have two choices:\n"
+                    "1) increase your exposure time to be at least"
+                    "larger than frame acquisition time\n"
+                    "2) increase the frame rate, if possible\n"
+                    "    - to increase exposure time, simply resubmit"
+                    " the ScanPlan with a longer exposure time\n"
+                    "    - to increase frame-rate/decrease the"
+                    " frame acquisition time, please use the"
+                    " following command:\n"
+                    "    >>> {} \n then rerun your ScanPlan definition"
+                    " or rerun the xrun.\n"
+                    "Note: by default, xpdAcq recommends running"
+                    "the detector at its fastest frame-rate\n"
+                    "(currently with a frame-acquisition time of"
+                    "0.1s)\n in which case you cannot set it to a"
+                    "lower value.".format(
+                        exposure,
+                        acq_time,
+                        ">>> glbl['frame_acq_time'] = 0.5  #set" " to 0.5s",
+                    )
+                )
+
+        # todo make
+        ret = yield from bps.read(det.cam.acquire_time)
+        if ret is None:
+            acq_time = 1
+        else:
+            acq_time = ret[det.cam.acquire_time.name]["value"]
+        _check_mini_expo(exposure, acq_time)
+        if hasattr(det, "images_per_set"):
+            # compute number of frames
+            num_frame = np.ceil(exposure / acq_time)
+            yield from bps.mov(det.images_per_set, num_frame)
+        else:
+            # The dexela detector does not support `images_per_set` so we just
+            # use whatever the user asks for as the thing
+            # TODO: maybe put in warnings if the exposure is too long?
+            num_frame = 1
+        computed_exposure = num_frame * acq_time
+
+        # print exposure time
+        print(
+            "INFO: requested exposure time = {} - > computed exposure time"
+            "= {}".format(exposure, computed_exposure)
+        )
+        return num_frame, acq_time, computed_exposure
+
+    # setting up area_detector
+    (ad,) = (d for d in dets if hasattr(d, "cam"))
+    (num_frame, acq_time, computed_exposure) = yield from _configure_area_det(
+        ad, exposure
+    )
+
+    # update md
+    _md = {
+        "sp_time_per_frame": acq_time,
+        "sp_num_frames": num_frame,
+        "sp_requested_exposure": exposure,
+        "sp_computed_exposure": computed_exposure,
+        "sp_type": "ct",
+        "sp_uid": str(uuid.uuid4()),
+        "sp_plan_name": "ct",
+    }
+    _md.update(md)
+    plan = bp.count(dets, md=_md)
+    plan = bpp.subs_wrapper(plan, LiveTable([]))
+    return (yield from plan)
