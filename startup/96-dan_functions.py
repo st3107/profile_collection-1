@@ -277,7 +277,9 @@ def scan_shifter_pos(
     peak_rad=1.5,
     use_det=True,
 ):
-    yn_question = lambda q: input(q).lower().strip()[0] == "y"
+    def yn_question(q):
+        return input(q).lower().strip()[0] == "y"
+
     print("")
     print("I'm going to move the motor: " + str(motor.name))
     print("It's currently at position: " + str(motor.position))
@@ -397,7 +399,8 @@ def _identify_peaks_scan_shifter_pos(
         this_fig.clf()
         plt.pause(0.01)
 
-    yn_question = lambda q: input(q).lower().strip()[0] == "y" or False
+    def yn_question(q):
+        return input(q).lower().strip()[0] == "y"
 
     y -= y.min()
     y /= y.max()
