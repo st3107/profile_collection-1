@@ -177,7 +177,7 @@ def read_twocol_data(
             except Exception:
                 pass  # print ('nope')
 
-    if backjunk == None:
+    if backjunk is None:
         for i in range(len(datain), -1, -1):
             try:
                 x1, y1 = (
@@ -208,7 +208,7 @@ def read_twocol_data(
     if shh == False:
         print("length " + str(len(xin)))
     if do_not_float:
-        if splitchar == None:
+        if splitchar is None:
             for i in range(len(datain)):
                 xin.append(datain[i].split()[use_idex[0]])
                 yin.append(datain[i].split()[use_idex[1]])
@@ -217,7 +217,7 @@ def read_twocol_data(
                 xin.append(datain[i].split(splitchar)[use_idex[0]])
                 yin.append(datain[i].split(splitchar)[use_idex[1]])
     else:
-        if splitchar == None:
+        if splitchar is None:
             for i in range(len(datain)):
                 xin[i] = float(datain[i].split()[use_idex[0]])
                 yin[i] = float(datain[i].split()[use_idex[1]])
@@ -257,7 +257,7 @@ def measure_me_this(df_sample_info, sample_num, measure_time=None):
     print("Preparing to measure " + str(df_sample_info.loc[sample_num, "sample_names"]))
     print("Moving to position " + str(df_sample_info.loc[sample_num, "position"]))
     # move logic goes here
-    if measure_time == None:
+    if measure_time is None:
         print("Measuring for " + str(df_sample_info.loc[sample_num, "measure_time"]))
         # perform xrun here (or Re(Count))
     else:
