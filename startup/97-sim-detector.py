@@ -13,6 +13,7 @@ class OmniaDetector(SynSignal):
     def __init__(self, dbr, name, motor1, motor_field1, motor2, motor_field2, **kwargs):
 
         self.dbr = dbr
+        self.name = name
         self.motor1 = motor1
         self.motor_field1 = motor_field1
         self.motor2 = motor2
@@ -54,8 +55,7 @@ class OmniaDetector(SynSignal):
                 nearest_uid = self.omnia_xy_index.uid[nearest_i]
                 print(f"nearest_uid: {nearest_uid}")
 
-                image_results = dbr[nearest_uid]
-                image = image_results.data("pe1c_image")
+                image = dbr[nearest_uid].data("pe1c_image")
 
             return image
 
