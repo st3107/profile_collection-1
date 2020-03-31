@@ -2,16 +2,23 @@ import os
 import time
 
 import pandas as pd
-import scipy.spatial.
+import numpy as np
 
-from ophyd.sim import Syn2DGauss
+from ophyd.sim import SynSignal
 
 omnia_xy_index_fp = "omnia_xy_index.txt"
 
 
-class OmniaDetector(Syn2DGauss):
-    def __init__(self, dbr, **kwargs):
-        super().__init__(**kwargs)
+class OmniaDetector(SynSignal):
+    def __init__(
+            self, dbr,
+            name,
+            motor1,
+            motor_field1,
+            motor2,
+            motor_field2,
+            **kwargs
+        ):  
 
         self.dbr = dbr
         if not os.path.exists(omnia_xy_index_fp):
@@ -23,17 +30,26 @@ class OmniaDetector(Syn2DGauss):
             header=0,
             index_col=0
         )
+        self.motor1 = motor1
+        self.motor_field1 = motor_field1
+        self.motor2 = motor2
+        self.motor_field2 = motor_field2
 
-    def _compute(self):
-        """
-        Grid_X: 8.903
-        Grid_Y: 768.94725
-        sample_name: omnia
-        """
-        x = self._motor0.read()[self._motor_field0]['value']
-        y = self._motor1.read()[self._motor_field1]['value']
+        def _compute():
+            """
+            Grid_X: 8.903
+            Grid_Y: 768.94725
+            sample_name: omnia
+            """
+            print(f"_computing!")
+            x = self.motor1.read()[self.motor_field1]['value']
+            y = self.motor2.read()[self.motor_field2]['value']
 
-        d = np.linalg.norm(self.omnia_xy_index['Grid_X', 'Grid_Y'] - )
+            d = np.linalg.norm(self.omnia_xy_index[['Grid_X', 'Grid_Y']] - [x, y])
+
+            return 2.0
+
+        super().__init__(name=name, func=_compute, **kwargs)
 
     def build_image_index(self):
         print(f"creating {omnia_xy_index_fp}")
@@ -52,3 +68,19 @@ class OmniaDetector(Syn2DGauss):
         )
         df.to_csv(omnia_xy_index_fp, sep="\t")
         print(f"finished {omnia_xy_index_fp} in {time.time()-t0:.3}s")
+
+
+from databroker import Broker
+from ophyd.sim import hw
+
+dbr = Broker.named("pdf")
+sim = hw()
+
+omnia_det = OmniaDetector(
+    dbr=dbr,
+    name="omnia_det",
+    motor1=sim.motor1,
+    motor_field1="motor1",
+    motor2=sim.motor2,
+    motor_field2="motor2"
+)
