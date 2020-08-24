@@ -38,10 +38,15 @@ cs700.setpoint.name = 'temperature_setpoint'
 """
 
 # Do not write a new Eurotherm class use the one from nslsii defined above
-eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}', name='eurotherm')
+# eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}', name='eurotherm')
+# eurotherm.timeout.set(1200)
+# eurotherm.equilibrium_time.set(10) # commented by MA
 
-eurotherm.timeout.set(1200)
-eurotherm.equilibrium_time.set(10)
+class Eurotherm(EpicsSignalPositioner):
+	def set(self, *args, **kwargs):
+		return super().set(*args, timeout=100000, **kwargs)
+
+eurotherm = Eurotherm('XF:28ID1-ES:1{Env:04}T-I', write_pv='XF:28ID1-ES:1{Env:04}T-SP', tolerance = 5, name='eurotherm')
 
 class CryoStream(Device):
     # readback
@@ -284,3 +289,58 @@ class Magnet(PVPositioner):
 magnet = Magnet('XF:28ID1-ES{LS625:1}:', name='magnet')
 magnet.done_value =0
 #
+
+#########control voltage on eurotherm directly
+eurovolt = EpicsSignal('XF:28ID1-ES:1{Env:04}Out-SP', name='eurovolt')
+
+
+from collections import deque
+
+from ophyd import (EpicsMotor, PVPositioner, PVPositionerPC,
+                           EpicsSignal, EpicsSignalRO, Device)
+from ophyd import Component as Cpt
+from ophyd import FormattedComponent as FmtCpt
+from ophyd import DynamicDeviceComponent as DDC
+from ophyd import DeviceStatus, OrderedDict
+
+
+class Lakeshore336Setpoint(PVPositioner):
+    readback = Cpt(EpicsSignalRO, 'T-RB')
+    setpoint = Cpt(EpicsSignal, 'T-SP')
+    done = Cpt(EpicsSignalRO, 'Sts:Ramp-Sts')
+    ramp_enabled = Cpt(EpicsSignal, 'Enbl:Ramp-Sel')
+    ramp_rate = Cpt(EpicsSignal, 'Val:Ramp-SP')
+    p_gain = Cpt(EpicsSignal, 'Gain:P-RB', write_pv='Gain:P-SP')
+    i_gain = Cpt(EpicsSignal, 'Gain:I-RB', write_pv='Gain:I-SP')
+    d_gain = Cpt(EpicsSignal, 'Gain:D-RB', write_pv='Gain:D-SP')
+    done_value = 0
+
+
+class Lakeshore336Channel(Device):
+    T = Cpt(EpicsSignalRO, 'T-I')
+    V = Cpt(EpicsSignalRO, 'Val:Sens-I')
+    status = Cpt(EpicsSignalRO, 'T-Sts')
+
+
+def _temp_fields(chans, **kwargs):
+    defn = OrderedDict()
+    for c in chans:
+        suffix = '-Chan:{}}}'.format(c)
+        defn[c] = (Lakeshore336Channel, suffix, kwargs)
+    return defn
+
+
+class Lakeshore336(Device):
+    temp = DDC(_temp_fields(['A','B','C','D']))
+    out1 = Cpt(Lakeshore336Setpoint, '-Out:1}')
+    out2 = Cpt(Lakeshore336Setpoint, '-Out:2}')
+    out3 = Cpt(Lakeshore336Setpoint, '-Out:3}')
+    out4 = Cpt(Lakeshore336Setpoint, '-Out:4}')                             
+
+
+lakeshore336 = Lakeshore336('XF:28ID1-ES{LS336:1' , name='lakeshore336')
+
+
+hotairblower=Eurotherm('XF:28ID1-ES:1{Env:03}T-I',
+        write_pv='XF:28ID1-ES:1{Env:03}T-SP',
+        tolerance=1,name='hotairblower')

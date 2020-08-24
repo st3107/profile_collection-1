@@ -1,3 +1,50 @@
+import sys
+import logging
+from slack import WebClient
+from slack.errors import SlackApiError
+import os
+
+##############
+slack_token = os.environ["SLACK_API_TOKEN"]
+client = WebClient(token=slack_token)
+
+
+###
+
+def slack_message(my_message):
+    try:
+        response = client.chat_postMessage(
+            channel = "pdf_dev",
+            #channel = user_name,
+            text = my_message,
+            )
+    #except SlackApiError as e:
+    #    assert e.response["something went wrong"]
+    except:
+        print ('slack message failed')
+
+def check_heartbeat(fname='hbeat.txt', tlapse=300,send_warning=False,notify_user=False):
+    fin = open(fname,'r')
+    tread = float(fin.read())
+    tpassed = time.time() - tread
+    if tpassed > tlapse:
+        tpassed_str = str(tpassed/60)[:3]
+        if send_warning:
+            msg_to_send = "Issue detected, no pulse in "+tpassed_str+" mins"
+            if notify_user:
+                msg_to_send = "<@"+str(user_ID)+"> "+msg_to_send
+            slack_message(msg_to_send)
+        return False
+    return True
+
+
+def update_heartbeat(fname='hbeat.txt'):
+    fout = open(fname,'w')
+    fout.write(str(time.time()))
+    fout.close()
+
+###
+
 def show_me(my_im,per_low = 1, per_high = 99, use_colorbar=False): 
      my_low = np.percentile(my_im,per_low) 
      my_high = np.percentile(my_im,per_high) 
@@ -5,21 +52,23 @@ def show_me(my_im,per_low = 1, per_high = 99, use_colorbar=False):
      if use_colorbar: 
          plt.colorbar() 
 
-def show_me_db(my_id,per_low=1, per_high=99, use_colorbar=False,dark_subtract=True,return_im=False):
+def show_me_db(my_id,per_low=1, per_high=99, use_colorbar=False,dark_subtract=True,return_im=False,return_dark=False):
     my_det_probably = db[my_id].start['detectors'][0]+'_image'
-    my_im = db[my_id].table(fill=True)[my_det_probably][1]
+    my_im = (db[my_id].table(fill=True)[my_det_probably][1]).astype(float)
     if len(my_im) == 0:
         print ('issue... passing')
         pass
     if dark_subtract:
         if 'sc_dk_field_uid' in db[my_id].start.keys():
             my_dark_id = db[my_id].start['sc_dk_field_uid']
-            dark_im = db[my_dark_id].table(fill=True)[my_det_probably][1]
+            dark_im = (db[my_dark_id].table(fill=True)[my_det_probably][1]).astype(float)
             my_im = my_im - dark_im
         else:
             print ('this run has no associated dark')
     if return_im:
         return my_im
+    if return_dark:
+        return dark_im
 
     show_me(my_im,per_low=per_low,per_high=per_high,use_colorbar=use_colorbar)
 
@@ -200,11 +249,11 @@ def make_me_a_dataframe(found_pos):
     read_xcel = pd.read_excel(my_excel_file,skiprows=1,usecols=([0,1]))
 
     df_sample_pos_info = pd.DataFrame(index=np.array(read_xcel.index))
-    df_sample_pos_info['sample_names'] = read_xcel.iloc[:,0]
-    df_sample_pos_info['position'] = np.hstack((found_pos[0],found_pos))
-    df_sample_pos_info['xpd_acq_sample_number'] = np.array(read_xcel.index)                          
-    df_sample_pos_info['sample_compositioin'] = read_xcel.iloc[:,1]
-    df_sample_pos_info['measure_time'] = np.ones(len(read_xcel.index))    
+    df_sample_pos_info['name'] = read_xcel.iloc[:,0]
+    df_sample_pos_info['pos'] = np.hstack((found_pos[0],found_pos))
+    df_sample_pos_info['xpdacq_name_num'] = np.array(read_xcel.index)                          
+    df_sample_pos_info['formula'] = read_xcel.iloc[:,1]
+    df_sample_pos_info['xpdacq_scanplan_num'] = 5*np.ones(len(read_xcel.index),dtype=int)    
 
     return df_sample_pos_info
 
@@ -388,7 +437,7 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     I_list = np.zeros(numx) 
     dx = (xmax-xmin)/numx 
     pos_list = np.linspace(xmin,xmax,numx) 
-    fs.set(1)
+    RE(mv(fs,'Open'))
     fig1, ax1 = plt.subplots() 
     use_det = True 
     for i, pos in enumerate(pos_list): 
@@ -409,7 +458,7 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     
     plt.plot(pos_list, I_list) 
     #plt.close()    
-    fs.set(0)
+    RE(mv(fs,'Close'))
     return pos_list, I_list 
 
 

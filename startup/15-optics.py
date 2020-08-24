@@ -1,6 +1,6 @@
 "Define motors related to optics"
 from ophyd.status import SubscriptionStatus
-
+from ophyd import Signal
 
 class Slits(Device):
     top = Cpt(EpicsMotor, 'T}Mtr')
@@ -16,6 +16,9 @@ class Slits(Device):
 
 ocm_slits = Slits('XF:28ID1B-OP{Slt:2-Ax:', name='ocm_slits')  # OCM Slits
 bdm_slits = Slits('XF:28ID1A-OP{Slt:1-Ax:', name='bdm_slits')  # BD Slits
+#Added by MA 09/03/2019
+wb_slits = Slits('XF:28ID1A-OP{Slt:0-Ax:', name='wb_slits')  # WB Slits
+
 
 class SideBounceMono(Device):
     x_wedgemount = Cpt(EpicsMotor, "X}Mtr")
@@ -55,6 +58,7 @@ sbm = SideBounceMono("XF:28ID1A-OP{Mono:SBM-Ax:", name='sbm')
 class PDFFastShutter(Device):
     cmd = Cpt(EpicsSignal, 'Cmd', kind='omitted')
     status = Cpt(EpicsSignal, 'Sts', kind='omitted')
+    settle_time = Cpt(Signal, kind='config', value=.1)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -74,7 +78,7 @@ class PDFFastShutter(Device):
                 return True
             return False
         self.cmd.set(self.setmap[val])
-        status = SubscriptionStatus(self.status, check_if_done)
+        status = SubscriptionStatus(self.status, check_if_done,settle_time=self.settle_time.get())
         return status
 
     def get(self):
@@ -124,3 +128,12 @@ class SpinnerGoniohead(Device):
 
 spinner_goniohead = SpinnerGoniohead(prefix="XF:28ID1B-ES{Stg:Smpl-Ax:",
                                      name="spinner_goniohead")
+
+# Added by MA - Sept 5, 2019
+class OCMTable(Device):
+    upstream_jack = Cpt(EpicsMotor, 'YU}Mtr')
+    downstream_jack = Cpt(EpicsMotor, 'YD}Mtr')
+    X = Cpt(EpicsMotor, 'X}Mtr')
+ 
+OCM_table = OCMTable(prefix="XF:28ID1B-ES{OCM-Ax:",
+                                  name="optics_table")

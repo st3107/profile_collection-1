@@ -343,31 +343,38 @@ class PerkinElmerStandard2(SingleTrigger, XPDPerkinElmer2):
 class PerkinElmerMulti2(MultiTrigger, XPDPerkinElmer2):
     shutter = C(EpicsSignal, 'XF:28IDC-ES:1{Sh:Exp}Cmd-Cmd')
 
-
+#temporary disable detector for testing -DO 11/25/19
 pe1 = PerkinElmerStandard1('XF:28ID1-ES{Det:PE1}', name='pe1', read_attrs=['tiff'])
+#################
+
+
 #pe1.stage_sigs.pop('cam.acquire')
 
 ################
-#disabled by Dan during detector testing - may 28, 2019
-#pe2 = PerkinElmerStandard2('XF:28ID1-ES{Det:PE2}', name='pe2', read_attrs=['tiff'])
+#Enabled for PE2 detector testing 11/25/19
+#pe1 = PerkinElmerStandard2('XF:28ID1-ES{Det:PE2}', name='pe1', read_attrs=['tiff'])
 #################
 
-#pe1m = PerkinElmerMulti1('XF:28IDC-ES:1{Det:PE1}', name='pe1', read_attrs=['tiff'],
-                        #trigger_cycle=[[('image', {shctl1: 1}),
-                                        #('dark_image', {shctl1: 0})]])
 
+#temporary disable detector for PE2 testing -MA 11/25/19
 pe1c = PerkinElmerContinuous1('XF:28ID1-ES{Det:PE1}', name='pe1c',
                              read_attrs=['tiff', 'stats1.total'],
                              plugin_name='tiff')
 ################
-#disabled by Dan during detector testing - may 28, 2019
-#pe2c = PerkinElmerContinuous2('XF:28ID1-ES{Det:PE2}', name='pe2c',
+
+
+################
+#enabled by MA during PE2 detector testing - 11/25/2019
+#pe1c = PerkinElmerContinuous2('XF:28ID1-ES{Det:PE2}', name='pe1c',
 #                             read_attrs=['tiff', 'stats1.total'],
 #                             plugin_name='tiff')
 #################
 
+#temporary disable detector for testing -DO 7/11/19
 pe1c.detector_type.kind='config'
 pe1.detector_type.kind='config'
+###################
+
 
 import time
 class CachedDetector:
