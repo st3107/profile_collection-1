@@ -1,0 +1,6 @@
+{
+    "python.linting.flake8Enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.enabled": true,
+    "python.pythonPath": "/opt/conda_envs/analysis-2019-3.0-pdf/bin/python"
+}
