@@ -6,12 +6,20 @@ import numpy as np
 
 from ophyd.sim import SynSignal
 
-omnia_xy_index_fp = "omnia_xy_index.txt"
-
 
 class OmniaDetector(SynSignal):
-    def __init__(self, dbr, name, motor1, motor_field1, motor2, motor_field2, **kwargs):
-
+    def __init__(
+        self,
+        dbr,
+        name,
+        motor1,
+        motor_field1,
+        motor2,
+        motor_field2,
+        *,
+        omnia_xy_index_fp="omnia_xy_index.txt",
+        **kwargs,
+    ):
         self.dbr = dbr
         self.name = name
         self.motor1 = motor1
@@ -64,9 +72,9 @@ class OmniaDetector(SynSignal):
     def build_image_index(self):
         print(f"creating {omnia_xy_index_fp}")
         t0 = time.time()
-        grid_x = list()
-        grid_y = list()
-        uids = list()
+        grid_x = []
+        grid_y = []
+        uids = []
         for h in self.dbr(sample_name="omnia"):
             grid_x.append(h.start["Grid_X"])
             grid_y.append(h.start["Grid_Y"])
@@ -79,17 +87,18 @@ class OmniaDetector(SynSignal):
         print(f"finished {omnia_xy_index_fp} in {time.time()-t0:.3}s")
 
 
-from databroker import Broker
-from ophyd.sim import hw
+def init_omnia_sim_detector():
+    from databroker import Broker
+    from ophyd.sim import hw
 
-dbr = Broker.named("pdf")
-sim = hw()
+    dbr = Broker.named("pdf")
+    sim = hw()
 
-omnia_det = OmniaDetector(
-    dbr=dbr,
-    name="omnia_det",
-    motor1=sim.motor1,
-    motor_field1="motor1",
-    motor2=sim.motor2,
-    motor_field2="motor2",
-)
+    return OmniaDetector(
+        dbr=dbr,
+        name="omnia_det",
+        motor1=sim.motor1,
+        motor_field1="motor1",
+        motor2=sim.motor2,
+        motor_field2="motor2",
+    )
