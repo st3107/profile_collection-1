@@ -83,25 +83,41 @@ def xrd_map(
        If we should "snake" or "typewriter" the fly axis
 
     """
+    # TODO input validation
+    # rename here to use better internal names (!!)
+    req_dwell_time = dwell_time
+    del dwell_time
+
     plan_args_cache = {
         k: v
         for k, v in locals().items()
         if k not in ("dets", "fly_motor", "step_motor")
     }
 
-    # TODO input validation
-
-    # round dwell time to nearest 10th of a second
-    dwell_time = np.round(dwell_time, 1)
+    (ad,) = (d for d in dets if hasattr(d, "cam"))
+    (num_frame, acq_time, computed_dwell_time) = yield from configure_area_det(
+        ad, req_dwell_time
+    )
 
     # set up metadata
-    _md = {}
+    sp = {
+        "time_per_frame": acq_time,
+        "num_frames": num_frame,
+        "requested_exposure": req_dwell_time,
+        "computed_exposure": computed_dwell_time,
+        "type": "ct",
+        "uid": str(uuid.uuid4()),
+        "plan_name": "map_scan",
+    }
     _md = {
         "detectors": [det.name for det in dets],
         "plan_args": plan_args_cache,
         "map_size": (fly_pixels, step_pixels),
         "hints": {},
+        "sp": sp,
+        **{f"sp_{k}": v for k, v in sp.items()},
     }
+
     _md["hints"].setdefault(
         "dimensions",
         [((f"start_{fly_motor.name}",), "primary"), ((step_motor.name,), "primary")],
@@ -114,7 +130,7 @@ def xrd_map(
 
     # TODO either think more carefully about how to compute this
     # or get the gating working below.
-    speed = abs(fly_stop - fly_start) / (fly_pixels * dwell_time)
+    speed = abs(fly_stop - fly_start) / (fly_pixels * computed_dwell_time)
 
     @bpp.reset_positions_decorator([fly_motor.velocity])
     @bpp.set_run_key_decorator(f"xrd_map_{uuid.uuid4()}")
