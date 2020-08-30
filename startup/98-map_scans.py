@@ -116,6 +116,7 @@ def xrd_map(
     # or get the gating working below.
     speed = abs(fly_stop - fly_start) / (fly_pixels * dwell_time)
 
+    @bpp.reset_positions_decorator([fly_motor.velocity])
     @bpp.set_run_key_decorator(f"xrd_map_{uuid.uuid4()}")
     @bpp.stage_decorator(dets)
     @bpp.run_decorator(md=_md)
@@ -123,6 +124,7 @@ def xrd_map(
         _fly_start, _fly_stop = fly_start, fly_stop
         _backoff = backoff
 
+        yield from bps.mv(fly_motor.velocity, speed)
         for step in np.linspace(step_start, step_stop, step_pixels):
             # TODO maybe go to a "move velocity here?
             yield from bps.abs_set(step_motor, step, group="pre_fly")
@@ -159,5 +161,4 @@ def xrd_map(
                 _fly_start, _fly_stop = _fly_stop, _fly_start
                 _backoff = -_backoff
 
-    yield from bps.configure(fly_motor, {"velocity": speed})
     yield from inner()
