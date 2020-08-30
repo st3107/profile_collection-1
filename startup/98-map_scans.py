@@ -5,6 +5,7 @@ import numpy as np
 import itertools
 import bluesky.preprocessors as bpp
 import bluesky.plan_stubs as bps
+from bluesky.utils import short_uid
 from ophyd import Signal
 
 
@@ -143,26 +144,30 @@ def xrd_map(
         yield from bps.mv(fly_motor.velocity, speed)
         for step in np.linspace(step_start, step_stop, step_pixels):
             # TODO maybe go to a "move velocity here?
-            yield from bps.abs_set(step_motor, step, group="pre_fly")
-            yield from bps.abs_set(fly_motor, _fly_start - _backoff, group="pre_fly")
+            yield from bps.abs_set(step_motor, step, group=short_uid("pre_fly"))
+            yield from bps.abs_set(
+                fly_motor, _fly_start - _backoff, group=short_uid("pre_fly")
+            )
 
             # take the dark while we might be waiting for motor movement
             if dark_plan:
                 yield from dark_plan(dets)
 
             # wait for the pre-fly motion to stop
-            yield from bps.wait(group="pre_fly")
+            yield from bps.wait(group=short_uid("pre_fly"))
 
-            yield from bps.abs_set(fly_motor, _fly_stop + _backoff, group="fly")
+            yield from bps.abs_set(
+                fly_motor, _fly_stop + _backoff, group=short_uid("fly")
+            )
             # TODO gate starting to take data on motor position
             for j in range(fly_pixels):
                 for d in dets:
-                    yield from bps.trigger(d, group="fly_pixel")
+                    yield from bps.trigger(d, group=short_uid("fly_pixel"))
                 # grab motor position right after we trigger
                 start_pos = yield from _extarct_motor_pos(fly_motor)
                 yield from bps.mv(px_start, start_pos)
                 # wait for frame to finish
-                yield from bps.wait(group="fly_pixel")
+                yield from bps.wait(group=short_uid("fly_pixel"))
                 # grab the motor position
                 stop_pos = yield from _extarct_motor_pos(fly_motor)
                 yield from bps.mv(px_stop, stop_pos)
