@@ -6,7 +6,29 @@ import itertools
 import bluesky.preprocessors as bpp
 import bluesky.plan_stubs as bps
 from bluesky.utils import short_uid
+
+import bluesky_darkframes
 from ophyd import Signal
+
+
+# vendored, simplified, and made public from bluesky_darkframes
+class SnapshotShell:
+    """
+    Shell to hold snapshots
+
+    This enables us to hot-swap Snapshot instances in the middle of a Run.
+    We hand this object to the RunEngine, so it sees one consistent
+    instance throughout the Run.
+    """
+
+    def __init__(self):
+        self.__snapshot = None
+
+    def set_snaphsot(self, snapshot):
+        self.__snapshot = snapshot
+
+    def __getattr__(self, key):
+        return getattr(self.__snapshot, key)
 
 
 def _extarct_motor_pos(mtr):
@@ -71,8 +93,15 @@ def xrd_map(
        this will be used to compute the motor velocity
 
     dark_plan : Plan or None
-       If not None, will be passed the detector list at the end of every
-       fast pass to inject logic to collect dark frames.
+       The expected signature is ::
+
+          def dp(det : Detector, shell : SnapshotShell):
+             ...
+
+        It only needs to handle one detector and is responsible for generating
+        the messages to generate events.  The logic of _if_ a darkframe should
+        be taken is handled else where.  This plan should close over
+        the shutter it needs to control.
 
     md : Optional[Dict[str, Any]]
        User-supplied meta-data
@@ -92,7 +121,7 @@ def xrd_map(
     plan_args_cache = {
         k: v
         for k, v in locals().items()
-        if k not in ("dets", "fly_motor", "step_motor")
+        if k not in ("dets", "fly_motor", "step_motor", "dark_plan")
     }
 
     (ad,) = (d for d in dets if hasattr(d, "cam"))
@@ -133,6 +162,8 @@ def xrd_map(
     # or get the gating working below.
     speed = abs(fly_stop - fly_start) / (fly_pixels * computed_dwell_time)
 
+    shell = SnapshotShell()
+
     @bpp.reset_positions_decorator([fly_motor.velocity])
     @bpp.set_run_key_decorator(f"xrd_map_{uuid.uuid4()}")
     @bpp.stage_decorator(dets)
@@ -151,7 +182,7 @@ def xrd_map(
 
             # take the dark while we might be waiting for motor movement
             if dark_plan:
-                yield from dark_plan(dets)
+                yield from dark_plan(ad, shell)
 
             # wait for the pre-fly motion to stop
             yield from bps.wait(group=short_uid("pre_fly"))
@@ -183,3 +214,33 @@ def xrd_map(
                 _backoff = -_backoff
 
     yield from inner()
+
+
+def dark_plan(detector, shell, *, shutter, stream_name="dark"):
+    # Restage to ensure that dark frames goes into a separate file.
+    gn = short_uid("df-close-shutter")
+    yield from bps.abs_set(shutter, "closed", group=gn)
+    yield from bps.unstage(detector)
+    yield from bps.stage(detector)
+    yield from bps.wait(group=gn)
+
+    # The `group` parameter passed to trigger MUST start with
+    # bluesky-darkframes-trigger.
+    yield from bps.trigger(detector, group=short_uid("bluesky-darkframes-trigger"))
+    yield from bps.wait("bluesky-darkframes-trigger")
+    snapshot = bluesky_darkframes.SnapshotDevice(detector)
+    shell.set_snaphsot(snapshot)
+
+    # emit the event to the dark stream
+    yield from bps.stage(shell)
+    yield from bps.trigger_and_read(
+        [shell], name=stream_name,
+    )
+    yield from bps.unstage(shell)
+
+    go = short_uid("df-open-shutter")
+    yield from bps.abs_set(shutter, "open", group=go)
+    # Restage.
+    yield from bps.unstage(detector)
+    yield from bps.stage(detector)
+    yield from bps.wait(group=go)
