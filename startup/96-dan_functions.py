@@ -2,6 +2,13 @@ import sys
 from slack import WebClient
 from slack.errors import SlackApiError
 import os
+import bluesky.plan_stubs as bps
+import bluesky.plans as bp
+import bluesky.preprocessors as bpp
+from bluesky.callbacks import LiveTable
+import uuid
+import numpy as np
+
 
 ##############
 slack_token = os.environ["SLACK_API_TOKEN"]
@@ -147,7 +154,7 @@ def plot_xline(my_id, *argv, use_offset=0, use_alpha=1, use_cmap="viridis"):
     try:
         arg_len = len(*argv)
         plot_mode = "typea"
-    except:
+    except Exception:
         arg_len = len(argv)
         plot_mode = "typeb"
 
@@ -177,7 +184,7 @@ def plot_yline(my_id, *argv, use_offset=0, use_alpha=1, use_cmap="viridis"):
     try:
         arg_len = len(*argv)
         plot_mode = "typea"
-    except:
+    except Exception:
         arg_len = len(argv)
         plot_mode = "typeb"
 
@@ -223,10 +230,10 @@ def read_twocol_data(
                     )
                 junk = i
                 break
-            except:
+            except Exception:
                 pass  # print ('nope')
 
-    if backjunk == None:
+    if backjunk is None:
         for i in range(len(datain), -1, -1):
             try:
                 x1, y1 = (
@@ -235,7 +242,7 @@ def read_twocol_data(
                 )
                 backjunk = len(datain) - i - 1
                 break
-            except:
+            except Exception:
                 pass
                 # print ('nope')
 
@@ -254,10 +261,10 @@ def read_twocol_data(
         xin = []
         yin = []
 
-    if shh == False:
+    if not shh:
         print("length " + str(len(xin)))
     if do_not_float:
-        if splitchar == None:
+        if splitchar is None:
             for i in range(len(datain)):
                 xin.append(datain[i].split()[use_idex[0]])
                 yin.append(datain[i].split()[use_idex[1]])
@@ -266,7 +273,7 @@ def read_twocol_data(
                 xin.append(datain[i].split(splitchar)[use_idex[0]])
                 yin.append(datain[i].split(splitchar)[use_idex[1]])
     else:
-        if splitchar == None:
+        if splitchar is None:
             for i in range(len(datain)):
                 xin[i] = float(datain[i].split()[use_idex[0]])
                 yin[i] = float(datain[i].split()[use_idex[1]])
@@ -308,7 +315,7 @@ def measure_me_this(df_sample_info, sample_num, measure_time=None):
     print("Preparing to measure " + str(df_sample_info.loc[sample_num, "sample_names"]))
     print("Moving to position " + str(df_sample_info.loc[sample_num, "position"]))
     # move logic goes here
-    if measure_time == None:
+    if measure_time is None:
         print("Measuring for " + str(df_sample_info.loc[sample_num, "measure_time"]))
         # perform xrun here (or Re(Count))
     else:
@@ -328,7 +335,9 @@ def scan_shifter_pos(
     peak_rad=1.5,
     use_det=True,
 ):
-    yn_question = lambda q: input(q).lower().strip()[0] == "y" or False
+    def yn_question(q):
+        return input(q).lower().strip()[0] == "y"
+
     print("")
     print("I'm going to move the motor: " + str(motor.name))
     print("It's currently at position: " + str(motor.position))
@@ -350,7 +359,7 @@ def scan_shifter_pos(
     else:
         print("I confused")
 
-    if yn_question("Confirm scan? [y/n] ") == False:
+    if not yn_question("Confirm scan? [y/n] "):
         print("Aborting operation")
         return None
 
@@ -364,11 +373,8 @@ def scan_shifter_pos(
         return None
 
     print("")
-    if (
-        yn_question(
-            "Move on to fitting? (if not, I'll return [pos_list, I_list]) [y/n] "
-        )
-        == False
+    if not yn_question(
+        "Move on to fitting? (if not, I'll return [pos_list, I_list]) [y/n] "
     ):
         return pos_list, I_list
     plt.close()
@@ -379,7 +385,7 @@ def scan_shifter_pos(
     tpeak_rad = peak_rad
     fit_attempts = 1
 
-    while go_on == False:
+    while not go_on:
         print("\nI'm going to fit peaks with a min_height of " + str(tmin_height))
         print(
             "and min_dist [index values/real vals] of "
@@ -409,7 +415,7 @@ def scan_shifter_pos(
             )
         fit_attempts += 1
         # if yn_question("\nHappy with the fit? [y/n] ") == False:
-        if go_on == False:
+        if not go_on:
             qans = input(
                 "\n1. Change min_height\n2. Change min_dist\n3. Change peak-fit rad\n0. Give up\n : "
             )
@@ -424,7 +430,7 @@ def scan_shifter_pos(
                 if int(qans) == 0:
                     print("ok, giving up")
                     return None
-            except:
+            except Exception:
                 print("what, what, whaaat?")
         else:
             print("Ok, great.")
@@ -451,7 +457,8 @@ def _identify_peaks_scan_shifter_pos(
         this_fig.clf()
         plt.pause(0.01)
 
-    yn_question = lambda q: input(q).lower().strip()[0] == "y" or False
+    def yn_question(q):
+        return input(q).lower().strip()[0] == "y"
 
     y -= y.min()
     y /= y.max()
@@ -488,7 +495,7 @@ def _identify_peaks_scan_shifter_pos(
     plt.show()
     print("done")
     plt.pause(0.01)
-    if yn_question("Go on? [y/n] ") == False:
+    if not yn_question("Go on? [y/n] "):
         return False, []
 
     # now refine positions
@@ -546,7 +553,7 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
         print("moving to " + str(pos))
         try:
             motor.move(pos)
-        except:
+        except Exception:
             print("well, something bad happened")
             return None
 
@@ -562,3 +569,83 @@ def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
     # plt.close()
     RE(mv(fs, "Close"))
     return pos_list, I_list
+
+
+def simple_ct(dets, exposure, *, md=None):
+    md = md or {}
+
+    def _configure_area_det(det, exposure):
+        """private function to configure pe1c with continuous acquisition mode"""
+
+        def _check_mini_expo(exposure, acq_time):
+            if exposure < acq_time:
+                raise ValueError(
+                    "WARNING: total exposure time: {}s is shorter "
+                    "than frame acquisition time {}s\n"
+                    "you have two choices:\n"
+                    "1) increase your exposure time to be at least"
+                    "larger than frame acquisition time\n"
+                    "2) increase the frame rate, if possible\n"
+                    "    - to increase exposure time, simply resubmit"
+                    " the ScanPlan with a longer exposure time\n"
+                    "    - to increase frame-rate/decrease the"
+                    " frame acquisition time, please use the"
+                    " following command:\n"
+                    "    >>> {} \n then rerun your ScanPlan definition"
+                    " or rerun the xrun.\n"
+                    "Note: by default, xpdAcq recommends running"
+                    "the detector at its fastest frame-rate\n"
+                    "(currently with a frame-acquisition time of"
+                    "0.1s)\n in which case you cannot set it to a"
+                    "lower value.".format(
+                        exposure,
+                        acq_time,
+                        ">>> glbl['frame_acq_time'] = 0.5  #set" " to 0.5s",
+                    )
+                )
+
+        # todo make
+        ret = yield from bps.read(det.cam.acquire_time)
+        if ret is None:
+            acq_time = 1
+        else:
+            acq_time = ret[det.cam.acquire_time.name]["value"]
+        _check_mini_expo(exposure, acq_time)
+        if hasattr(det, "images_per_set"):
+            # compute number of frames
+            num_frame = np.ceil(exposure / acq_time)
+            yield from bps.mov(det.images_per_set, num_frame)
+        else:
+            # The dexela detector does not support `images_per_set` so we just
+            # use whatever the user asks for as the thing
+            # TODO: maybe put in warnings if the exposure is too long?
+            num_frame = 1
+        computed_exposure = num_frame * acq_time
+
+        # print exposure time
+        print(
+            "INFO: requested exposure time = {} - > computed exposure time"
+            "= {}".format(exposure, computed_exposure)
+        )
+        return num_frame, acq_time, computed_exposure
+
+    # setting up area_detector
+    (ad,) = (d for d in dets if hasattr(d, "cam"))
+    (num_frame, acq_time, computed_exposure) = yield from _configure_area_det(
+        ad, exposure
+    )
+
+    # update md
+    _md = {
+        "sp_time_per_frame": acq_time,
+        "sp_num_frames": num_frame,
+        "sp_requested_exposure": exposure,
+        "sp_computed_exposure": computed_exposure,
+        "sp_type": "ct",
+        "sp_uid": str(uuid.uuid4()),
+        "sp_plan_name": "ct",
+    }
+    _md.update(md)
+    plan = bp.count(dets, md=_md)
+    plan = bpp.subs_wrapper(plan, LiveTable([]))
+    return (yield from plan)
