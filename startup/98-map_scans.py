@@ -103,13 +103,13 @@ def xrd_map(
         "hints": {},
     }
     _md["hints"].setdefault(
-        "dimensions", [((fly_motor.name,), "primary"), ((step_motor.name,), "primary")]
+        "dimensions", [((f"start_{fly_motor.name}",), "primary"), ((step_motor.name,), "primary")]
     )
     _md.update(md or {})
     # soft signal to use for tracking pixel edges
     # TODO put better metadata on these
-    px_start = Signal(name=f"start_{fly_motor.name}")
-    px_stop = Signal(name=f"stop_{fly_motor.name}")
+    px_start = Signal(name=f"start_{fly_motor.name}",kind='normal')
+    px_stop = Signal(name=f"stop_{fly_motor.name}",kind='normal')
 
     # TODO either think more carefully about how to compute this
     # or get the gating working below.

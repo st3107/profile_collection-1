@@ -199,13 +199,43 @@ def BDM_plot():
 	#ax2.set_zlim3d(0,100)
 	pl.show()
 
-#def temp()
-#	Det_1_Z.move(1674.44155)
-#	Grid_X.move(32)
-#	Grid_Y.move(41.75)
-#	Grid_Z.move(830.39405)
+# ----------turbo() is a Temporary fix until auto turbo mode is implemented in the css layer---------
+from epics import caget, caput
+turbo_T = 110 # Turbo turning on temperature
+def turbo():
+    current_T = cryostream.T.get()
+    tb = caget("XF:28ID1-ES:1{Env:01}Cmd:Turbo-Cmd")
+    if current_T <= turbo_T and tb == 0:
+        caput("XF:28ID1-ES:1{Env:01}Cmd:Turbo-Cmd", 1)
+        time.sleep(2)
+        caput("XF:28ID1-ES:1{Env:01}Cmd-Cmd", 20)
+    if current_T >= turbo_T and tb == 1:
+        caput("XF:28ID1-ES:1{Env:01}Cmd:Turbo-Cmd", 0)
+        time.sleep(2)
+        caput("XF:28ID1-ES:1{Env:01}Cmd-Cmd", 20)    
 
- #Mirror_VFM.y_upstream.move(-2.3695)
- #Mirror_VFM.y_downstream_inboard.move(-1.5492)
- #Mirror_VFM.y_downstream_outboard.move(-1.2505)
+#---------------------------function to display the dark subtracted last image ----------------------------------
+from tifffile import imread, imshow, imsave
+def lastimage(n):
+    hdr=db[-n]
+    for doc in hdr.documents(fill=True):
+           data1=doc[1].get('data')
+           if data1 != None:
+               light_img=data1['pe1c_image']
+
+    dark_uid=hdr.start. get('sc_dk_field_uid')  
+    dk_hdrs=db(uid=dark_uid)
+    for dk_hdr in dk_hdrs:
+       for doc in dk_hdr.documents(fill=True):
+           dk_data1=doc[1].get('data')
+           if dk_data1 != None:
+               dk_img=dk_data1['pe1c_image']
+
+    I = light_img - dk_img
+    imshow(I, vmax = (I.sum()/(2048*2048)), cmap = 'jet' )
+    imsave("/nsls2/xf28id1/xpdacq_data/user_data/tiff_base/" + "dark_sub_image" + ".tiff", light_img - dk_img)
+    imsave("/nsls2/xf28id1/xpdacq_data/user_data/tiff_base/" + "dark_image" + ".tiff", dk_img)
+    imsave("/nsls2/xf28id1/xpdacq_data/user_data/tiff_base/" + "light_image" + ".tiff", light_img)
+    
+
 
