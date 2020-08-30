@@ -637,16 +637,18 @@ def simple_ct(dets, exposure, *, md=None):
         ad, exposure
     )
 
-    # update md
-    _md = {
-        "sp_time_per_frame": acq_time,
-        "sp_num_frames": num_frame,
-        "sp_requested_exposure": exposure,
-        "sp_computed_exposure": computed_exposure,
-        "sp_type": "ct",
-        "sp_uid": str(uuid.uuid4()),
-        "sp_plan_name": "ct",
+    sp = {
+        "time_per_frame": acq_time,
+        "num_frames": num_frame,
+        "requested_exposure": exposure,
+        "computed_exposure": computed_exposure,
+        "type": "ct",
+        "uid": str(uuid.uuid4()),
+        "plan_name": "ct",
     }
+
+    # update md
+    _md = {"sp": sp, **{f"sp_{k}": v for k, v in sp.items()}}
     _md.update(md)
     plan = bp.count(dets, md=_md)
     plan = bpp.subs_wrapper(plan, LiveTable([]))
