@@ -150,12 +150,15 @@ def xrd_map(
         "sp": sp,
         **{f"sp_{k}": v for k, v in sp.items()},
     }
-
+    _md.update(md or {})
     _md["hints"].setdefault(
         "dimensions",
         [((f"start_{fly_motor.name}",), "primary"), ((step_motor.name,), "primary")],
     )
-    _md.update(md or {})
+    _md["hints"].setdefault(
+        "extents", [(fly_start, fly_stop), (step_stop, step_start)],
+    )
+
     # soft signal to use for tracking pixel edges
     # TODO put better metadata on these
     px_start = Signal(name=f"start_{fly_motor.name}", kind="normal")
@@ -175,7 +178,7 @@ def xrd_map(
         _fly_start, _fly_stop = fly_start, fly_stop
         _backoff = backoff
 
-        #yield from bps.mv(fly_motor.velocity, speed)
+        # yield from bps.mv(fly_motor.velocity, speed)
         for step in np.linspace(step_start, step_stop, step_pixels):
             # TODO maybe go to a "move velocity here?
             yield from bps.mv(fly_motor.velocity, 10)
