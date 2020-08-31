@@ -124,7 +124,7 @@ def xrd_map(
     plan_args_cache = {
         k: v
         for k, v in locals().items()
-        if k not in ("dets", "fly_motor", "step_motor", "dark_plan")
+        if k not in ("dets", "fly_motor", "step_motor", "dark_plan", "shutter")
     }
 
     (ad,) = (d for d in dets if hasattr(d, "cam"))
