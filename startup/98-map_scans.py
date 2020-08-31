@@ -71,7 +71,7 @@ def xrd_map(
     dets : List[OphydObj]
 
     shutter : Movable
-        Assumed to have "Open" and "Closed" as the commands
+        Assumed to have "Open" and "Close" as the commands
 
     fly_motor : Movable
        The motor that will be moved continuously during collection
@@ -167,7 +167,7 @@ def xrd_map(
 
     shell = SnapshotShell()
 
-    @bpp.reset_positions_decorator([fly_motor.velocity, shutter])
+    @bpp.reset_positions_decorator([fly_motor.velocity])
     @bpp.set_run_key_decorator(f"xrd_map_{uuid.uuid4()}")
     @bpp.stage_decorator(dets)
     @bpp.run_decorator(md=_md)
@@ -175,9 +175,10 @@ def xrd_map(
         _fly_start, _fly_stop = fly_start, fly_stop
         _backoff = backoff
 
-        yield from bps.mv(fly_motor.velocity, speed)
+        #yield from bps.mv(fly_motor.velocity, speed)
         for step in np.linspace(step_start, step_stop, step_pixels):
             # TODO maybe go to a "move velocity here?
+            yield from bps.mv(fly_motor.velocity, 10)
             pre_fly_group = short_uid("pre_fly")
             yield from bps.abs_set(step_motor, step, group=pre_fly_group)
             yield from bps.abs_set(
@@ -186,12 +187,13 @@ def xrd_map(
 
             # take the dark while we might be waiting for motor movement
             if dark_plan:
-                yield from bps.mv(shutter, "Closed")
+                yield from bps.mv(shutter, "Close")
                 yield from dark_plan(ad, shell)
             yield from bps.mv(shutter, "Open")
             # wait for the pre-fly motion to stop
             yield from bps.wait(group=pre_fly_group)
 
+            yield from bps.mv(fly_motor.velocity, speed)
             fly_group = short_uid("fly")
             yield from bps.abs_set(fly_motor, _fly_stop + _backoff, group=fly_group)
             # TODO gate starting to take data on motor position
@@ -215,7 +217,7 @@ def xrd_map(
                 for obj in dets + [px_start, px_stop, step_motor, shutter]:
                     yield from bps.read(obj)
                 yield from bps.save()
-            yield from bps.mv(shutter, "Closed")
+            yield from bps.mv(shutter, "Close")
             yield from bps.wait(group=fly_group)
 
             if snake:
