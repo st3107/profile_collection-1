@@ -45,6 +45,7 @@ def _extarct_motor_pos(mtr):
 
 def xrd_map(
     dets,
+    shutter,
     fly_motor,
     fly_start,
     fly_stop,
@@ -68,6 +69,9 @@ def xrd_map(
     Parameters
     ----------
     dets : List[OphydObj]
+
+    shutter : Movable
+        Assumed to have "Open" and "Closed" as the commands
 
     fly_motor : Movable
        The motor that will be moved continuously during collection
@@ -100,8 +104,7 @@ def xrd_map(
 
         It only needs to handle one detector and is responsible for generating
         the messages to generate events.  The logic of _if_ a darkframe should
-        be taken is handled else where.  This plan should close over
-        the shutter it needs to control.
+        be taken is handled else where.
 
     md : Optional[Dict[str, Any]]
        User-supplied meta-data
@@ -164,7 +167,7 @@ def xrd_map(
 
     shell = SnapshotShell()
 
-    @bpp.reset_positions_decorator([fly_motor.velocity])
+    @bpp.reset_positions_decorator([fly_motor.velocity, shutter])
     @bpp.set_run_key_decorator(f"xrd_map_{uuid.uuid4()}")
     @bpp.stage_decorator(dets)
     @bpp.run_decorator(md=_md)
@@ -175,30 +178,35 @@ def xrd_map(
         yield from bps.mv(fly_motor.velocity, speed)
         for step in np.linspace(step_start, step_stop, step_pixels):
             # TODO maybe go to a "move velocity here?
-            yield from bps.abs_set(step_motor, step, group=short_uid("pre_fly"))
+            pre_fly_group = short_uid("pre_fly")
+            yield from bps.abs_set(step_motor, step, group=pre_fly_group)
             yield from bps.abs_set(
-                fly_motor, _fly_start - _backoff, group=short_uid("pre_fly")
+                fly_motor, _fly_start - _backoff, group=pre_fly_group
             )
 
             # take the dark while we might be waiting for motor movement
             if dark_plan:
+                yield from bps.mv(shutter, "Closed")
                 yield from dark_plan(ad, shell)
-
+            yield from bps.mv(shutter, "Open")
             # wait for the pre-fly motion to stop
-            yield from bps.wait(group=short_uid("pre_fly"))
+            yield from bps.wait(group=pre_fly_group)
 
-            yield from bps.abs_set(
-                fly_motor, _fly_stop + _backoff, group=short_uid("fly")
-            )
+            fly_group = short_uid("fly")
+            yield from bps.abs_set(fly_motor, _fly_stop + _backoff, group=fly_group)
             # TODO gate starting to take data on motor position
             for j in range(fly_pixels):
+
+                fly_pixel_group = short_uid("fly_pixel")
                 for d in dets:
-                    yield from bps.trigger(d, group=short_uid("fly_pixel"))
+                    yield from bps.trigger(d, group=fly_pixel_group)
+
                 # grab motor position right after we trigger
                 start_pos = yield from _extarct_motor_pos(fly_motor)
                 yield from bps.mv(px_start, start_pos)
                 # wait for frame to finish
-                yield from bps.wait(group=short_uid("fly_pixel"))
+                yield from bps.wait(group=fly_pixel_group)
+
                 # grab the motor position
                 stop_pos = yield from _extarct_motor_pos(fly_motor)
                 yield from bps.mv(px_stop, stop_pos)
@@ -207,6 +215,8 @@ def xrd_map(
                 for obj in dets + [px_start, px_stop, step_motor]:
                     yield from bps.read(obj)
                 yield from bps.save()
+            yield from bps.mv(shutter, "Closed")
+            yield from bps.wait(group=fly_group)
 
             if snake:
                 # if snaking, flip these for the next pass through
@@ -216,13 +226,10 @@ def xrd_map(
     yield from inner()
 
 
-def dark_plan(detector, shell, *, shutter, stream_name="dark"):
+def dark_plan(detector, shell, *, stream_name="dark"):
     # Restage to ensure that dark frames goes into a separate file.
-    gn = short_uid("df-close-shutter")
-    yield from bps.abs_set(shutter, "closed", group=gn)
     yield from bps.unstage(detector)
     yield from bps.stage(detector)
-    yield from bps.wait(group=gn)
 
     # The `group` parameter passed to trigger MUST start with
     # bluesky-darkframes-trigger.
@@ -238,9 +245,6 @@ def dark_plan(detector, shell, *, shutter, stream_name="dark"):
     )
     yield from bps.unstage(shell)
 
-    go = short_uid("df-open-shutter")
-    yield from bps.abs_set(shutter, "open", group=go)
     # Restage.
     yield from bps.unstage(detector)
     yield from bps.stage(detector)
-    yield from bps.wait(group=go)
