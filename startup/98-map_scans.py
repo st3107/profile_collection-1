@@ -212,7 +212,7 @@ def xrd_map(
                 yield from bps.mv(px_stop, stop_pos)
                 # generate the event
                 yield from bps.create("primary")
-                for obj in dets + [px_start, px_stop, step_motor]:
+                for obj in dets + [px_start, px_stop, step_motor, shutter]:
                     yield from bps.read(obj)
                 yield from bps.save()
             yield from bps.mv(shutter, "Closed")
@@ -233,8 +233,10 @@ def dark_plan(detector, shell, *, stream_name="dark"):
 
     # The `group` parameter passed to trigger MUST start with
     # bluesky-darkframes-trigger.
-    yield from bps.trigger(detector, group=short_uid("bluesky-darkframes-trigger"))
-    yield from bps.wait("bluesky-darkframes-trigger")
+    grp = short_uid("bluesky-darkframes-trigger")
+    yield from bps.trigger(detector, group=grp)
+    yield from bps.wait(grp)
+    yield from bps.read(detector)
     snapshot = bluesky_darkframes.SnapshotDevice(detector)
     shell.set_snaphsot(snapshot)
 
