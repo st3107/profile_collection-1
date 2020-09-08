@@ -148,6 +148,7 @@ def xrd_map(
         "map_size": (fly_pixels, step_pixels),
         "hints": {},
         "sp": sp,
+        "extents": [(fly_start, fly_stop), (step_stop, step_start)],
         **{f"sp_{k}": v for k, v in sp.items()},
     }
     _md.update(md or {})
@@ -155,9 +156,9 @@ def xrd_map(
         "dimensions",
         [((f"start_{fly_motor.name}",), "primary"), ((step_motor.name,), "primary")],
     )
-    _md["hints"].setdefault(
-        "extents", [(fly_start, fly_stop), (step_stop, step_start)],
-    )
+    #_md["hints"].setdefault(
+    #    "extents", [(fly_start, fly_stop), (step_stop, step_start)],
+    #)
 
     # soft signal to use for tracking pixel edges
     # TODO put better metadata on these
@@ -180,6 +181,7 @@ def xrd_map(
 
         # yield from bps.mv(fly_motor.velocity, speed)
         for step in np.linspace(step_start, step_stop, step_pixels):
+            yield from bps.checkpoint()
             # TODO maybe go to a "move velocity here?
             yield from bps.mv(fly_motor.velocity, 10)
             pre_fly_group = short_uid("pre_fly")
@@ -191,11 +193,12 @@ def xrd_map(
             # take the dark while we might be waiting for motor movement
             if dark_plan:
                 yield from bps.mv(shutter, "Close")
+                yield from bps.sleep(2)
                 yield from dark_plan(ad, shell)
-            yield from bps.mv(shutter, "Open")
             # wait for the pre-fly motion to stop
             yield from bps.wait(group=pre_fly_group)
-
+            yield from bps.mv(shutter, "Open")
+            yield from bps.sleep(2)
             yield from bps.mv(fly_motor.velocity, speed)
             fly_group = short_uid("fly")
             yield from bps.abs_set(fly_motor, _fly_stop + _backoff, group=fly_group)
@@ -217,12 +220,13 @@ def xrd_map(
                 yield from bps.mv(px_stop, stop_pos)
                 # generate the event
                 yield from bps.create("primary")
-                for obj in dets + [px_start, px_stop, step_motor, shutter]:
+                for obj in dets + [px_start, px_stop, step_motor]:
                     yield from bps.read(obj)
                 yield from bps.save()
+            yield from bps.checkpoint()
             yield from bps.mv(shutter, "Close")
             yield from bps.wait(group=fly_group)
-
+            yield from bps.checkpoint()
             if snake:
                 # if snaking, flip these for the next pass through
                 _fly_start, _fly_stop = _fly_stop, _fly_start

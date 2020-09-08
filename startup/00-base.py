@@ -6,8 +6,15 @@ from bluesky.utils import ts_msg_hook
 # See docstring for nslsii.configure_base() for more details
 # this command takes away much of the boilerplate for settting up a profile
 # (such as setting up best effort callbacks etc)
-nslsii.configure_base(get_ipython().user_ns, 'pdf', pbar=True, bec=True,
-                      magics=True, mpl=True)
+nslsii.configure_base(
+    get_ipython().user_ns,
+    'pdf',
+    pbar=True,
+    bec=True,
+    magics=True,
+    mpl=True,
+    publish_documents_to_kafka=True
+)
 
 from pathlib import Path
 
