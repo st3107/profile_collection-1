@@ -1,4 +1,5 @@
 # Make ophyd listen to pyepics.
+import logging
 import nslsii
 import time
 from bluesky.utils import ts_msg_hook
@@ -68,17 +69,10 @@ RE.md = PersistentDict(runengine_metadata_dir)
 # Optional: set any metadata that rarely changes.
 # RE.md['beamline_id'] = 'YOUR_BEAMLINE_HERE'
 
-
 # At the end of every run, verify that files were saved and
 # print a confirmation message.
 #from bluesky.callbacks.broker import verify_files_saved, post_run
 # RE.subscribe(post_run(verify_files_saved, db), 'stop')
-
-# Uncomment the following lines to turn on verbose messages for
-# debugging.
-# import logging
-# ophyd.logger.setLevel(logging.DEBUG)
-# logging.basicConfig(level=logging.DEBUG)
 
 # RE.msg_hook = ts_msg_hook
 

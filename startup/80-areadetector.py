@@ -20,7 +20,7 @@ from nslsii.ad33 import StatsPluginV33
 #shctl1 = EpicsMotor('XF:28IDC-ES:1{Sh2:Exp-Ax:5}Mtr', name='shctl1')
 
 # monkey patch for trailing slash problem
-def _ensure_trailing_slash(path,**kwargs): #<- these kwargs are Toms
+def _ensure_trailing_slash(path, path_semantics=None):
     """
     'a/b/c' -> 'a/b/c/'
     EPICS adds the trailing slash itself if we do not, so in order for the

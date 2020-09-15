@@ -74,6 +74,12 @@ else:
 
 from xpdacq.calib import *
 
+# We are adding this here because the previous 
+# line overwrites our logger config. This undoes the logger changes.
+import logging
+logging.getLogger().handlers.clear()
+
+
 # analysis functions, only at beamline
 #from xpdan.data_reduction import *
 
