@@ -299,6 +299,8 @@ def make_me_a_dataframe(found_pos):
 
     read_xcel = pd.read_excel(my_excel_file, skiprows=1, usecols=([0, 1]))
 
+    print ('expecting length '+str(len(np.array(read_xcel.index))))
+
     df_sample_pos_info = pd.DataFrame(index=np.array(read_xcel.index))
     df_sample_pos_info["name"] = read_xcel.iloc[:, 0]
     df_sample_pos_info["pos"] = np.hstack((found_pos[0], found_pos))
@@ -307,6 +309,7 @@ def make_me_a_dataframe(found_pos):
     df_sample_pos_info["xpdacq_scanplan_num"] = 5 * np.ones(
         len(read_xcel.index), dtype=int
     )
+
 
     return df_sample_pos_info
 
@@ -538,6 +541,11 @@ def _identify_peaks_scan_shifter_pos(
 
     # finally, return this as a numpy list
     return True, fit_peak_cen_list[::-1]  # return flipped
+
+
+def get_total_counts():
+    from epics import caget
+    return float(caget("XF:28ID1-ES{Det:PE1}Stats2:Total_RBV"))
 
 
 def _motor_move_scan_shifter_pos(motor, xmin, xmax, numx):
