@@ -111,7 +111,7 @@ diffraction_dets:
 - dexela_image
 - dexela
 dk_window: 0.1
-exp_broker_name: pdf
+exp_broker_name: xpdd
 exp_hash_uid: f4be92ca-79c1-49ae-9bcd-59c7a8185aa3
 facility: NSLS-II
 frame_acq_time: 0.1
@@ -136,7 +136,7 @@ mask_kwargs:
   v_asym: 0
 name: glbl
 outbound_proxy_address: xf28id1-ca1:5578
-owner: PDF
+owner: XPDD
 radiogram_dets:
 - blackfly_det
 radiograph_names:

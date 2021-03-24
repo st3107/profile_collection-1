@@ -2,7 +2,7 @@ archive_base_dir_name: .userbeamtimearchive
 archive_root_dir: /mnt/data/bnl/xpdacq_special/archive
 base_dir: /mnt/data/bnl/xpdacq_special/data
 beamline_host_name: [jupiter]
-beamline_id: 28-ID-1
+beamline_id: 28-ID-D
 blconfig_dir_name: xpdConfig
 blconfig_name: xpd_beamline_config.yml
 calib_config_name: xpdAcq_calib_info.yml
@@ -13,7 +13,7 @@ glbl_yaml_name: glbl.yml
 group: XPD
 home_dir_name: user_data
 image_field: pe1c_image
-owner: PDF
+owner: XPDD
 simulation: false
 shutter_conf: {close: 0, open: 1}
 mask_kwargs:
@@ -25,7 +25,7 @@ mask_kwargs:
   alpha: 3.0
 dark_field_key : sc_dk_field_uid
 det_image_field : pe1_image
-exp_broker_name: pdf
+exp_broker_name: xpdd
 outbound_proxy_address: 'xf28id1-ca1:5578'
 inbound_proxy_address: 'xf28id1-ca1:5577'
 shutter_sleep: 0
